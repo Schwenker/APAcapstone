@@ -1,5 +1,9 @@
 from tkinter import *
 
+def donothing():
+   filewin = Toplevel(root)
+   button = Button(filewin, text="GO")
+   button.pack()
 def Standard():
    filewin = Toplevel(root)
    button = Button(filewin, text="GO")
