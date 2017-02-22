@@ -1,23 +1,38 @@
 import tkinter
+# from tkinter import messagebox
 from tkinter import *
+
+
+def runStandard():
+   print("This is where the standard test sequence would run...")
+def runFullMap():
+   print("This is where the high resolution test sequence would run...")
+def runSinglePoint():
+   print("This is where the single-point test sequence would run...")
 
 def donothing():
    filewin = Toplevel(root)
    button = Button(filewin, text="GO")
    button.pack()
-def Standard():
+def StandardButton():
    filewin = Toplevel(root)
-   button = Button(filewin, text="GO")
+   button = Button(filewin, text="GO", command = runStandard)
    button.pack()
-def FullMap():
+def FullMapButton():
    filewin = Toplevel(root)
-   button = Button(filewin, text="GO")
+   button = Button(filewin, text="GO", command = runFullMap)
    button.pack()
-def SinglePoint():
+def SinglePointButton():
    filewin = Toplevel(root)
-   button = Button(filewin, text="GO")
+   button = Button(filewin, text="GO", command = runSinglePoint)
    button.pack()
-   
+
+top = tkinter.Tk()
+B1 = tkinter.Button(top, text = "R&D Standard", command = runStandard)
+# Pick up editing here to add buttons for the main menue / front page of
+# the illustrative GUI powerpoint created on Feb 18, 2017
+
+# Everything below here is from the menus example I found online
 root = Tk()
 menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
@@ -49,4 +64,6 @@ helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
+
+# GUI scripts usualy end with this
 root.mainloop()
