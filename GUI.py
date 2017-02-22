@@ -12,7 +12,7 @@ def runSinglePoint():
 
 def donothing():
    filewin = Toplevel(root)
-   button = Button(filewin, text="GO")
+   button = Button(filewin, text="Do Nothing")
    button.pack()
 def StandardButton():
    filewin = Toplevel(root)
@@ -28,7 +28,13 @@ def SinglePointButton():
    button.pack()
 
 top = tkinter.Tk()
-B1 = tkinter.Button(top, text = "R&D Standard", command = runStandard)
+B1 = tkinter.Button(top, text = "R&D Standard", bg = "#000fff000", activebackground = "#000000", command = runStandard)
+B1.pack()
+B2 = tkinter.Button(top, text = "USGA Full Map", bg = "#000fff000", activebackground = "#000000", command = runFullMap)
+B2.pack()
+B3 = tkinter.Button(top, text = "Single Point", bg = "#000fff000", activebackground = "#000000", command = runSinglePoint)
+B3.pack()
+
 # Pick up editing here to add buttons for the main menue / front page of
 # the illustrative GUI powerpoint created on Feb 18, 2017
 
