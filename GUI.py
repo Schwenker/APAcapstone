@@ -1,5 +1,5 @@
 import tkinter
-# from tkinter import messagebox
+from tkinter import messagebox
 from tkinter import *
 
 
@@ -27,6 +27,7 @@ def SinglePointButton():
    button = Button(filewin, text="GO", command = runSinglePoint)
    button.pack()
 
+messagebox.showinfo("Notice", "Please center the face of the golf club before pressing a test button!") #Should this line go below the next one?
 top = tkinter.Tk()
 B1 = tkinter.Button(top, text = "R&D Standard", bg = "#000fff000", activebackground = "#000000", command = runStandard)
 B1.pack()
