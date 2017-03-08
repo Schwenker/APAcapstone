@@ -21,10 +21,14 @@ pin_sleep = 22
 sleepON = 0
 sleepOFF = 1
 
+# Swap these pairs to change button directions
 directionLeft = 0
 directionRight = 1
 directionUp = 0
 directionDown = 1
+
+
+
 
 # Set up pin modes (OUT or IN)
 gpio.setmode(gpio.BOARD) # BOARD mode means literal physical pin numbers
@@ -37,20 +41,29 @@ gpio.setup(pin_stepVertical, gpio.OUT)
 
 gpio.output(pin_sleep, sleepON)
 
+# Flag for button held down
+buttonHeld = False
+def buttonOn():
+        buttonHeld = True
+def buttonOff():
+        buttonHeld = False
+
 def stepLeft():
         gpio.output(pin_sleep, sleepOFF)
-        for x in range(0, 100):
-                        gpio.output(pin_directionHorizontal, directionLeft)
-                        gpio.output(pin_stepHorizontal, 0)
-                        time.sleep(sleeptime/2)
-                        gpio.output(pin_stepHorizontal, 1)
-                        time.sleep(sleeptime/2)
+        #buttonHeld = True
+        gpio.output(pin_directionHorizontal, directionLeft)
+        for x in range(0, 99):
+        #while (buttonHeld == True):
+                gpio.output(pin_stepHorizontal, 0)
+                time.sleep(sleeptime/2)
+                gpio.output(pin_stepHorizontal, 1)
+                time.sleep(sleeptime/2)
         gpio.output(pin_sleep, sleepON)
         
 def stepRight():
          gpio.output(pin_sleep, sleepOFF)
-         for x in range(0, 100):
-                        gpio.output(pin_directionHorizontal, directionRight)
+         gpio.output(pin_directionHorizontal, directionRight)
+         for x in range(0, 99):                   
                         gpio.output(pin_stepHorizontal, 0)
                         time.sleep(sleeptime/2)
                         gpio.output(pin_stepHorizontal, 1)
@@ -59,8 +72,8 @@ def stepRight():
 
 def stepUp():
         gpio.output(pin_sleep, sleepOFF)
-        for x in range(0, 100):
-                        gpio.output(pin_directionVertical, directionUp)
+        gpio.output(pin_directionVertical, directionUp)
+        for x in range(0, 99):
                         gpio.output(pin_stepVertical, 0)
                         time.sleep(sleeptime/2)
                         gpio.output(pin_stepVertical, 1)
@@ -69,8 +82,8 @@ def stepUp():
 
 def stepDown():
         gpio.output(pin_sleep, sleepOFF)
-        for x in range(0, 100):
-                        gpio.output(pin_directionVertical, directionDown)
+        gpio.output(pin_directionVertical, directionDown)
+        for x in range(0, 99):
                         gpio.output(pin_stepVertical, 0)
                         time.sleep(sleeptime/2)
                         gpio.output(pin_stepVertical, 1)
@@ -136,8 +149,11 @@ B2.pack()
 B3 = tkinter.Button(top, text = "Single Point", bg = "#000fff000", activebackground = "#000000", command = runSinglePoint)
 B3.pack()
 
+# tkinter's repeatdelay and repeatinterval values are in miliseconds
 B4 = tkinter.Button(top, text = "Left", bg = "#000fff000", activebackground = "#000000", command = stepLeft)
 B4.pack()
+#B4.bind('<Button-1>',stepLeft)
+#B4.bind('ButtonRelease-1',buttonOff)
 B5 = tkinter.Button(top, text = "Right", bg = "#000fff000", activebackground = "#000000", command = stepRight)
 B5.pack()
 B6 = tkinter.Button(top, text = "Up", bg = "#000fff000", activebackground = "#000000", command = stepUp)
@@ -150,40 +166,40 @@ B7.pack()
 # the illustrative GUI powerpoint created on Feb 18, 2017
 
 # Everything below here is from the menus example I found online
-root = Tk()
-menubar = Menu(root)
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="New", command=donothing)
-filemenu.add_command(label="Open", command=donothing)
-filemenu.add_command(label="Save", command=donothing)
-filemenu.add_command(label="Save as...", command=donothing)
-filemenu.add_command(label="Close", command=donothing)
-
-filemenu.add_separator()
-
-filemenu.add_command(label="Exit", command=root.quit)
-menubar.add_cascade(label="File", menu=filemenu)
-editmenu = Menu(menubar, tearoff=0)
-editmenu.add_command(label="Undo", command=donothing)
-
-editmenu.add_separator()
-
-editmenu.add_command(label="Cut", command=donothing)
-editmenu.add_command(label="Copy", command=donothing)
-editmenu.add_command(label="Paste", command=donothing)
-editmenu.add_command(label="Delete", command=donothing)
-editmenu.add_command(label="Select All", command=donothing)
-
-menubar.add_cascade(label="Edit", menu=editmenu)
-helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="Help Index", command=donothing)
-helpmenu.add_command(label="About...", command=donothing)
-menubar.add_cascade(label="Help", menu=helpmenu)
-
-root.config(menu=menubar)
+##root = Tk()
+##menubar = Menu(root)
+##filemenu = Menu(menubar, tearoff=0)
+##filemenu.add_command(label="New", command=donothing)
+##filemenu.add_command(label="Open", command=donothing)
+##filemenu.add_command(label="Save", command=donothing)
+##filemenu.add_command(label="Save as...", command=donothing)
+##filemenu.add_command(label="Close", command=donothing)
+##
+##filemenu.add_separator()
+##
+##filemenu.add_command(label="Exit", command=root.quit)
+##menubar.add_cascade(label="File", menu=filemenu)
+##editmenu = Menu(menubar, tearoff=0)
+##editmenu.add_command(label="Undo", command=donothing)
+##
+##editmenu.add_separator()
+##
+##editmenu.add_command(label="Cut", command=donothing)
+##editmenu.add_command(label="Copy", command=donothing)
+##editmenu.add_command(label="Paste", command=donothing)
+##editmenu.add_command(label="Delete", command=donothing)
+##editmenu.add_command(label="Select All", command=donothing)
+##
+##menubar.add_cascade(label="Edit", menu=editmenu)
+##helpmenu = Menu(menubar, tearoff=0)
+##helpmenu.add_command(label="Help Index", command=donothing)
+##helpmenu.add_command(label="About...", command=donothing)
+##menubar.add_cascade(label="Help", menu=helpmenu)
+##
+##root.config(menu=menubar)
 
 # GUI scripts usualy end with this
-root.mainloop()
+top.mainloop()
 
 
 
@@ -199,6 +215,5 @@ root.mainloop()
 #        set_stepper_on()
         
 
-#gpio.ceanup()
-
+gpio.cleanup()
 
