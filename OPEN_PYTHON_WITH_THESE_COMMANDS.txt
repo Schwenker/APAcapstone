@@ -7,6 +7,9 @@
 # virtual envorionment to be able to use it.
 # That's what these three commands do.
 
+# From there, go to file->open to open your script
+# using OpenCV.
+
 source ~/.profile
 workon cv
 python -m idlelib
