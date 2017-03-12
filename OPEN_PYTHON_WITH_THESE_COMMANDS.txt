@@ -1,0 +1,12 @@
+# Copy and paste these three commands into
+# the terminal on the RPi to open the Python IDLE
+# I made a "virtual environment" in which to run
+# OpenCV. OpenCV is not accessible to Python
+# outside of the virtual environment, so you
+# have to open the Pythyon IDLE from inside the 
+# virtual envorionment to be able to use it.
+# That's what these three commands do.
+
+source ~/.profile
+workon cv
+python -m idlelib
