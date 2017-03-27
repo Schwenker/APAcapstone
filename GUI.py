@@ -10,8 +10,8 @@ menusize = '800x450-0+0'
 buttonwidth = 20
 buttonheight = 4
 buttonsize_relative = 0.3
-
 colorGreen = "#000fff000"
+dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
 
 def donothing():
     print("Do nothing")
@@ -27,26 +27,33 @@ def manual():
     manual_backButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text="<-", bg="#000fff000", activebackground="#000000", command=manual_back)
     manual_backButton.pack()
     manual_backButton.place(anchor=NW)
-    left_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Left", bg = colorGreen, activebackground = "#000000", command = donothing)
-    left_button.pack()
-    left_button.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_leftButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Left", bg = colorGreen, activebackground = "#000000", command = donothing)
+    manual_leftButton.pack()
+    manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
     #B4.bind('<Button-1>',stepLeft)
     #B4.bind('ButtonRelease-1',buttonOff)
-    right_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Right", bg = "#000fff000", activebackground = "#000000", command = donothing)
-    right_button.pack()
-    right_button.place(relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    up_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Up", bg = "#000fff000", activebackground = "#000000", command = donothing)
-    up_button.pack()
-    up_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    down_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Down", bg = "#000fff000", activebackground = "#000000", command = donothing)
-    down_button.pack()
-    down_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_rightButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Right", bg = "#000fff000", activebackground = "#000000", command = donothing)
+    manual_rightButton.pack()
+    manual_rightButton.place(relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_upButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Up", bg = "#000fff000", activebackground = "#000000", command = donothing)
+    manual_upButton.pack()
+    manual_upButton.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_downButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text="Down", bg="#000fff000", activebackground = "#000000", command = donothing)
+    manual_downButton.pack()
+    manual_downButton.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_tposButton = tkinter.Button(manual_menu, text="Type in a position", bg="#000fff000", activebackground = "#000000", command = donothing)
+    manual_tposButton.pack()
+    manual_tposButton.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2+1.25*buttonsize_relative, relheight=buttonsize_relative/2, relwidth=buttonsize_relative)
     manual_menu.mainloop()
 def options():
     options_menu = Toplevel(top)
     def changeColor():
         # USE THIS FOR COLOR CALIBRATION
-        colorchooser.askcolor(initialcolor='#ff0000')
+        top.iconify()
+        options_menu.lower()
+        dotColor = colorchooser.askcolor()
+        print(dotColor)
+        top.deiconify()
         options_menu.lift()
     def options_back():
         options_menu.destroy()
@@ -55,8 +62,9 @@ def options():
     options_backButton = tkinter.Button(options_menu, height=buttonheight, width=buttonwidth, text = "<-", bg = "#000fff000", activebackground = "#000000", command = options_back)
     options_backButton.pack()
     options_backButton.place(anchor=NW)
-    options_colorButton = tkinter.Button(options_menu, height=buttonheight, width=buttonwidth, text = "Change Tracking Color", bg = "#000fff000", activebackground = "#000000", command = changeColor)
+    options_colorButton = tkinter.Button(options_menu, text = "Change Tracking Color", bg = "#000fff000", activebackground = "#000000", command = changeColor)
     options_colorButton.pack()
+    options_colorButton.place
     options_menu.mainloop()
 
 
