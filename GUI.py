@@ -3,13 +3,61 @@ import sys
 
 import tkinter
 from tkinter import messagebox
+from tkinter import colorchooser
 from tkinter import *
 
+menusize = '800x450-0+0'
+buttonwidth = 20
+buttonheight = 4
+buttonsize_relative = 0.3
+
+colorGreen = "#000fff000"
 
 def donothing():
-   filewin = Toplevel(root)
-   button = Button(filewin, text="Do Nothing")
-   button.pack()
+    print("Do nothing")
+
+
+def manual():
+    manual_menu = Toplevel(top)
+    def manual_back():
+        manual_menu.destroy()
+    manual_menu.title('Manual Control')
+    manual_menu.geometry(menusize)
+    manual_menu.resizable(FALSE,FALSE)
+    manual_backButton = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text="<-", bg="#000fff000", activebackground="#000000", command=manual_back)
+    manual_backButton.pack()
+    manual_backButton.place(anchor=NW)
+    left_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Left", bg = colorGreen, activebackground = "#000000", command = donothing)
+    left_button.pack()
+    left_button.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    #B4.bind('<Button-1>',stepLeft)
+    #B4.bind('ButtonRelease-1',buttonOff)
+    right_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Right", bg = "#000fff000", activebackground = "#000000", command = donothing)
+    right_button.pack()
+    right_button.place(relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    up_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Up", bg = "#000fff000", activebackground = "#000000", command = donothing)
+    up_button.pack()
+    up_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    down_button = tkinter.Button(manual_menu, height=buttonheight, width=buttonwidth, text = "Down", bg = "#000fff000", activebackground = "#000000", command = donothing)
+    down_button.pack()
+    down_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    manual_menu.mainloop()
+def options():
+    options_menu = Toplevel(top)
+    def changeColor():
+        # USE THIS FOR COLOR CALIBRATION
+        colorchooser.askcolor(initialcolor='#ff0000')
+        options_menu.lift()
+    def options_back():
+        options_menu.destroy()
+    options_menu.title('Options')
+    options_menu.geometry(menusize)
+    options_backButton = tkinter.Button(options_menu, height=buttonheight, width=buttonwidth, text = "<-", bg = "#000fff000", activebackground = "#000000", command = options_back)
+    options_backButton.pack()
+    options_backButton.place(anchor=NW)
+    options_colorButton = tkinter.Button(options_menu, height=buttonheight, width=buttonwidth, text = "Change Tracking Color", bg = "#000fff000", activebackground = "#000000", command = changeColor)
+    options_colorButton.pack()
+    options_menu.mainloop()
 
 
 #def options_menu():
@@ -19,77 +67,34 @@ def donothing():
 
 
 top = tkinter.Tk()
+top.title('Automated Clubface CT Tester')
+top.geometry(menusize)
+top.resizable(FALSE,FALSE)
 
 
+manual_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Manual Control", bg = "#000fff000", activebackground = "#000000", command = manual)
+manual_button.pack()
+manual_button.place(relx=(1-buttonsize_relative)/2, rely=0, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
-RnD_button = tkinter.Button(top, text = "R&D Standard", bg = "#000fff000", activebackground = "#000000", command = donothing)
+options_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Options", bg = "#000fff000", activebackground = "#000000", command = options)
+options_button.pack()
+options_button.place(relx=(1-buttonsize_relative)/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+
+
+RnD_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "R&D Standard", bg = "#000fff000", activebackground = "#000000", command = donothing)
 RnD_button.pack()
+RnD_button.place(relx=0, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
-fullMap_button = tkinter.Button(top, text = "USGA Full Map", bg = "#000fff000", activebackground = "#000000", command = donothing)
+fullMap_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "USGA Full Map", bg = "#000fff000", activebackground = "#000000", command = donothing)
 fullMap_button.pack()
+fullMap_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
-single_button = tkinter.Button(top, text = "Single Point", bg = "#000fff000", activebackground = "#000000", command = donothing)
+single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Single Point", bg = "#000fff000", activebackground = "#000000", command = donothing)
 single_button.pack()
-
-back_button = tkinter.Button(top, text = "<- BACK", bg = "#000fff000", activebackground = "#000000", command = donothing)
-back_button.pack()
-
-options_button = tkinter.Button(top, text = "OPTIONS", bg = "#000fff000", activebackground = "#000000", command = donothing)
+single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
-B4 = tkinter.Button(top, text = "Left", bg = "#000fff000", activebackground = "#000000", command = stepLeft)
-B4.pack()
-#B4.bind('<Button-1>',stepLeft)
-#B4.bind('ButtonRelease-1',buttonOff)
-B5 = tkinter.Button(top, text = "Right", bg = "#000fff000", activebackground = "#000000", command = stepRight)
-B5.pack()
-B6 = tkinter.Button(top, text = "Up", bg = "#000fff000", activebackground = "#000000", command = stepUp)
-B6.pack()
-B7 = tkinter.Button(top, text = "Down", bg = "#000fff000", activebackground = "#000000", command = stepDown)
-B7.pack()
-
-
-
-
-
-
-
-# Everything below here is from the menus example I found online
-##root = Tk()
-##menubar = Menu(root)
-##filemenu = Menu(menubar, tearoff=0)
-##filemenu.add_command(label="New", command=donothing)
-##filemenu.add_command(label="Open", command=donothing)
-##filemenu.add_command(label="Save", command=donothing)
-##filemenu.add_command(label="Save as...", command=donothing)
-##filemenu.add_command(label="Close", command=donothing)
-##
-##filemenu.add_separator()
-##
-##filemenu.add_command(label="Exit", command=root.quit)
-##menubar.add_cascade(label="File", menu=filemenu)
-##editmenu = Menu(menubar, tearoff=0)
-##editmenu.add_command(label="Undo", command=donothing)
-##
-##editmenu.add_separator()
-##
-##editmenu.add_command(label="Cut", command=donothing)
-##editmenu.add_command(label="Copy", command=donothing)
-##editmenu.add_command(label="Paste", command=donothing)
-##editmenu.add_command(label="Delete", command=donothing)
-##editmenu.add_command(label="Select All", command=donothing)
-##
-##menubar.add_cascade(label="Edit", menu=editmenu)
-##helpmenu = Menu(menubar, tearoff=0)
-##helpmenu.add_command(label="Help Index", command=donothing)
-##helpmenu.add_command(label="About...", command=donothing)
-##menubar.add_cascade(label="Help", menu=helpmenu)
-##
-##root.config(menu=menubar)
-
 
 
 
 top.mainloop()
-
-
