@@ -4,6 +4,7 @@ import sys
 import tkinter
 from tkinter import messagebox
 from tkinter import colorchooser
+from tkinter import PhotoImage
 from tkinter import *
 
 # Variables for easy changes
@@ -11,13 +12,18 @@ menusize = '800x450-0+0'
 buttonwidth = 20
 buttonheight = 4
 buttonsize_relative = 0.3
-buttonColor = "#000fff000"      #Pure green
+
+# Logo gold = '#d4bc20'
+buttonColor = "#d48c20"
 bColor_active = "#000000000"    #Pure black
 dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
 
 # Messages for easy changes
 message_calibrate = "Make sure the golf clubface is centered before calibrating. This cannot be undone.\n\n Do you want to continue?"
 title_calibrate = "Positional Calibration"
+
+#main_background = PhotoImage(file="golf.jpg")
+
 
 def donothing():    # Do nothing
     print("Do nothing")
@@ -89,6 +95,8 @@ def options():      # Open the options menu
 
 
 top = tkinter.Tk()
+
+
 top.title('Automated Clubface CT Tester')
 top.geometry(menusize)
 top.resizable(FALSE,FALSE)
