@@ -154,7 +154,8 @@ def stepDown():
 ##            gpio.output(pin_stepVertical, 1)
 ##            gpio.output(pin_stepVerticalRight, 1)
 ##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep,     print("Step down")
+##    gpio.output(pin_sleep,     
+    print("Step down")
 
 def donothing():    # Do nothing
     print("Do nothing")
