@@ -11,7 +11,24 @@ from tkinter import colorchooser
 from tkinter import PhotoImage
 from tkinter import *
 
+# Variables for easy changes
+menusize = '800x450-0+0'
+buttonwidth = 9
+buttonheight = 4
+buttonsize_relative = 0.3
 
+# Logo gold = "#d4bc20"
+buttonColor = "#d48c20"
+bColor_active = "#000000000"    #Pure black
+dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
+
+# Messages for easy changes
+message_calibrate = "Make sure the golf clubface is centered before calibrating. This cannot be undone.\n\n Do you want to continue?"
+title_top = 'Automated Clubface CT Tester'
+title_calibrate = "Positional Calibration"
+title_manual = 'Manual Control'
+title_goto = 'Go To Point'
+title_options = 'Options'
 
 sleeptime = 2/1000 # In seconds
 
@@ -49,25 +66,6 @@ directionPendLower = 1
 ##gpio.setup(pin_stepPendulum, gpio.OUT)
 ##
 ##gpio.output(pin_sleep, sleepON)
-
-# Variables for easy changes
-menusize = '800x450-0+0'
-buttonwidth = 9
-buttonheight = 4
-buttonsize_relative = 0.3
-
-# Logo gold = "#d4bc20"
-buttonColor = "#d48c20"
-bColor_active = "#000000000"    #Pure black
-dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
-
-# Messages for easy changes
-message_calibrate = "Make sure the golf clubface is centered before calibrating. This cannot be undone.\n\n Do you want to continue?"
-title_top = 'Automated Clubface CT Tester'
-title_calibrate = "Positional Calibration"
-title_manual = 'Manual Control'
-title_goto = 'Go To Point'
-title_options = 'Options'
 
 
 ##### UNTESTED AS OF APR 2ND, MIGHT BE BUGGY #################
