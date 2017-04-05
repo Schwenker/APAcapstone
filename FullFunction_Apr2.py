@@ -2,7 +2,7 @@
 import time
 import sys
 import math
-#import numpy as np
+import numpy as np
 from functools import partial
 
 import tkinter
@@ -13,9 +13,11 @@ from tkinter import *
 
 # Variables for easy changes
 menusize = '800x450-0+0'
-buttonwidth = 9
+buttonwidth = 6
 buttonheight = 4
 buttonsize_relative = 0.3
+gotogrid_offset_x = 55
+gotogrid_offset_y = 80
 
 # Logo gold = "#d4bc20"
 buttonColor = "#d48c20"
@@ -66,40 +68,35 @@ directionPendLower = 1
 ##gpio.setup(pin_stepPendulum, gpio.OUT)
 ##
 ##gpio.output(pin_sleep, sleepON)
-
-
-##### UNTESTED AS OF APR 2ND, MIGHT BE BUGGY #################
-
 # Create the maps for point positions in mm from center
 # Common lie angles at address are 15, 16, and 17 degrees
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
-##points_0 = np.matrix([[-20, -15, -5, 0, 5, 10, 15, 20, -20, -15, -5, 0, 5, 10, 15, 20, -20, -15, -5, 0, 5, 10, 15, 20, -20, -15, -5, 0, 5, 10, 15, 20, -20, -15, -5, 0, 5, 10, 15, 20],
-##                      [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, -5, -5, -5, -5, -5, -5, -5, -5, -10, -10, -10, -10, -10, -10, -10, -10, -10]])
-##ang = math.radians(-15)
-##rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                     [-(math.sin(ang)), math.cos(ang)]])
-##points_15 = np.matmul(rotator, points_0)
-##ang = math.radians(-1)
-##rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                     [-(math.sin(ang)), math.cos(ang)]])
-##points_16 = np.matmul(rotator, points_15)
-##points_17 = np.matmul(rotator, points_16)
-##points_other = points_0
-##
-##def rotate(angle):
-##    if angle==15:
-##        return points_15
-##    elif angle==16:
-##        return points_16
-##    elif angle==17:
-##        return points_17
-##    else:
-##        ang = math.radians(-angle)
-##        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                         [-(math.sin(ang)), math.cos(ang)]])
-##        points_other = np.matmul(rotator, points_0)
-##        return points_other
+points_0 = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
+ang = math.radians(-15)
+rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+points_15 = np.matmul(rotator, points_0)
+ang = math.radians(-1)
+rotator = [[math.cos(ang), math.sin(ang)],
+                     [-(math.sin(ang)), math.cos(ang)]]
+points_16 = np.matmul(rotator, points_15)
+points_17 = np.matmul(rotator, points_16)
+points_other = points_0
+
+##### UNTESTED AS OF APR 2ND, MIGHT BE BUGGY #################
+def rotate(angle):
+    if angle==15:
+        return points_15
+    elif angle==16:
+        return points_16
+    elif angle==17:
+        return points_17
+    else:
+        ang = math.radians(-angle)
+        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
+                         [-(math.sin(ang)), math.cos(ang)]])
+        points_other = np.matmul(rotator, points_0)
+        return points_other
 ######## END UNTESTED SECTION ################################
 
 
@@ -113,7 +110,7 @@ def stepLeft():
 ##            gpio.output(pin_stepHorizontal, 1)
 ##            time.sleep(sleeptime/2)
 ##    gpio.output(pin_sleep, sleepON)
-    print("Step left")
+    print("Step left" )
 
 def stepRight():
 ##    gpio.output(pin_sleep, sleepOFF)
@@ -154,7 +151,7 @@ def stepDown():
 ##            gpio.output(pin_stepVertical, 1)
 ##            gpio.output(pin_stepVerticalRight, 1)
 ##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep,     
+##    gpio.output(pin_sleep,
     print("Step down")
 
 def donothing():    # Do nothing
@@ -197,7 +194,7 @@ def manual():       # Open the manual controls mneu
         manual_goto_backButton.place(anchor=NW, relheight=buttonsize_relative/2,
                                      relwidth=buttonsize_relative/2)
         manual_goto_frame = Frame(manual_goto_menu, height=400, width=480)
-        manual_goto_frame.place(x=72, y=80)
+        manual_goto_frame.place(x=gotogrid_offset_x, y=gotogrid_offset_y)
 
         for ctr in range(45):
             if ctr==22:
