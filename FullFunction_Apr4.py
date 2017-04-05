@@ -1,8 +1,12 @@
+## To resume after Apr 4th
+## Finish working on rounding the pointsCurrent_steps matrix
+## and feeding it to goto()
+
 #import RPi.GPIO as gpio
 import time
 import sys
 import math
-import numpy as np
+#import numpy as np
 from functools import partial
 
 import tkinter
@@ -12,19 +16,24 @@ from tkinter import PhotoImage
 from tkinter import *
 
 # Variables for easy changes
+
+# Conversion ratios: milimeters -> steps
+mm2steps_horiz = 25
+mm2steps_vert = 25
+
+# GUI sizes and colors
 menusize = '800x450-0+0'
 buttonwidth = 6
 buttonheight = 4
 buttonsize_relative = 0.3
 gotogrid_offset_x = 55
 gotogrid_offset_y = 80
-
 # Logo gold = "#d4bc20"
 buttonColor = "#d48c20"
 bColor_active = "#000000000"    #Pure black
 dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
 
-# Messages for easy changes
+# Messages and titles
 message_calibrate = "Make sure the golf clubface is centered before calibrating. This cannot be undone.\n\n Do you want to continue?"
 title_top = 'Automated Clubface CT Tester'
 title_calibrate = "Positional Calibration"
@@ -46,9 +55,10 @@ pin_directionVerticalRight = 22
 pin_directionPendulum = 31
 
 pin_sleep = 37
+
+# Binary variables
 sleepON = 1
 sleepOFF = 0
-
 directionLeft = 1
 directionRight = 0
 directionUp = 1
@@ -56,6 +66,7 @@ directionDown = 0
 directionPendRaise = 0
 directionPendLower = 1
 
+# Initialize pinouts
 ##gpio.setmode(gpio.BOARD)
 ##gpio.setup(pin_sleep, gpio.OUT)
 ##gpio.setup(pin_directionHorizontal, gpio.OUT)
@@ -68,68 +79,104 @@ directionPendLower = 1
 ##gpio.setup(pin_stepPendulum, gpio.OUT)
 ##
 ##gpio.output(pin_sleep, sleepON)
+
 # Create the maps for point positions in mm from center
 # Common lie angles at address are 15, 16, and 17 degrees
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
-points_0 = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
-ang = math.radians(-15)
-rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
-points_15 = np.matmul(rotator, points_0)
-ang = math.radians(-1)
-rotator = [[math.cos(ang), math.sin(ang)],
-                     [-(math.sin(ang)), math.cos(ang)]]
-points_16 = np.matmul(rotator, points_15)
-points_17 = np.matmul(rotator, points_16)
-points_other = points_0
+##points0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
+##ang = math.radians(-15)
+##rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+##points15_mm = np.matmul(rotator, points0_mm)
+##ang = math.radians(-1)
+##rotator = [[math.cos(ang), math.sin(ang)],
+##                     [-(math.sin(ang)), math.cos(ang)]]
+##points16_mm = np.matmul(rotator, points15_mm)
+##points17_mm = np.matmul(rotator, points16_mm)
+##pointsOther_mm = points0_mm
 
-##### UNTESTED AS OF APR 2ND, MIGHT BE BUGGY #################
-def rotate(angle):
-    if angle==15:
-        return points_15
-    elif angle==16:
-        return points_16
-    elif angle==17:
-        return points_17
-    else:
-        ang = math.radians(-angle)
-        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-                         [-(math.sin(ang)), math.cos(ang)]])
-        points_other = np.matmul(rotator, points_0)
-        return points_other
-######## END UNTESTED SECTION ################################
+points15_steps = points15_mm
+points15_steps[0][:] *= mm2steps_horiz
+points15_steps[1][:] *= mm2steps_vert
 
+points16_steps = points16_mm
+points16_steps[0][:] *= mm2steps_horiz
+points16_steps[1][:] *= mm2steps_vert
+ 
+points17_steps = points17_mm
+points17_steps[0][:] *= mm2steps_horiz
+points17_steps[1][:] *= mm2steps_vert
 
-def stepLeft():
+pointsOther_steps = pointsOther_mm
+pointsOther_steps[0][:] *= mm2steps_horiz
+pointsOther_steps[1][:] *= mm2steps_vert
+
+pointsCurrent_steps = points15_steps
+
+def donothing():    # Do nothing
+    print("Do nothing")
+
+def calibrate():
+    pos_steps_horiz = 0
+    pos_steps_vert = 0
+    print("Horizontal position: %s mm" % (pos_steps_horiz) )
+    print("Vertical position: %s mm" % (pos_steps_vert) )
+
+##def rotate(angle):
+##    if angle==15:
+##        pointsCurrent_steps = points15_steps
+##        return points15_mm
+##    elif angle==16:
+##        pointsCurrent_steps = points16_steps
+##        return points16_mm
+##    elif angle==17:
+##        pointsCurrent_steps = points17_steps    
+##        return points17_mm
+##    else:
+##        ang = math.radians(-angle)
+##        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
+##                         [-(math.sin(ang)), math.cos(ang)]])
+##        pointsOther_mm = np.matmul(rotator, points0_mm)
+##        pointsCurrent_steps = pointsOther_mm    
+##        return pointsOther_mm
+
+def goto(point):
+    horiz_dist =  pos_steps_horiz
+    print("Go to point %s" % (point) )
+
+def stepLeft(dist=100):
 ##    gpio.output(pin_sleep, sleepOFF)
 ##    gpio.output(pin_directionHorizontal, directionLeft)
-##    for x in range(0,99):
+##      for x in range(0,dist-1):
 ##        #while(buttonHeld == True)
 ##            gpio.output(pin_stepHorizontal, 0)
 ##            time.sleep(sleeptime/2)
 ##            gpio.output(pin_stepHorizontal, 1)
 ##            time.sleep(sleeptime/2)
 ##    gpio.output(pin_sleep, sleepON)
-    print("Step left" )
+    print("Old horizontal position: %s" % (pos_steps_horiz) )
+    pos_steps_horiz = pos_step_horiz - dist
+    print("New horizontal position: %s" % (pos_steps_horiz) )
+    
 
-def stepRight():
+def stepRight(dist):
 ##    gpio.output(pin_sleep, sleepOFF)
 ##    gpio.output(pin_directionHorizontal, directionRight)
-##    for x in range(0,99):
-##        #while(buttonHeld == True)
+##    for x in range(0,dist-1):
 ##            gpio.output(pin_stepHorizontal, 0)
 ##            time.sleep(sleeptime/2)
 ##            gpio.output(pin_stepHorizontal, 1)
 ##            time.sleep(sleeptime/2)
 ##    gpio.output(pin_sleep, sleepON)
-    print("Step right")
+    print("Old horizontal position: %s" % (pos_steps_horiz) )
+    pos_steps_horiz = pos_step_horiz + dist
+    print("New horizontal position: %s" % (pos_steps_horiz) )
 
-def stepUp():
+def stepUp(dist):
 ##    gpio.output(pin_sleep, sleepOFF)
 ##    gpio.output(pin_directionVertical, directionUp)
 ##    gpio.output(pin_directionVerticalRight, directionUp)
-##    for x in range(0,99):
-##        #while(buttonHeld == True)
+##    for x in range(0,dist-1):
 ##            gpio.output(pin_stepVertical, 0)
 ##            gpio.output(pin_stepVerticalRight, 0)
 ##            time.sleep(sleeptime/2)
@@ -137,14 +184,15 @@ def stepUp():
 ##            gpio.output(pin_stepVerticalRight, 1)
 ##            time.sleep(sleeptime/2)
 ##    gpio.output(pin_sleep, sleepON)
-    print("Step up")
+    print("Old vertical position: %s" % (pos_steps_vert) )
+    pos_steps_vert = pos_step_vert + dist
+    print("New horizontal position: %s" % (pos_steps_vert) )
 
-def stepDown():
+def stepDown(dist):
 ##    gpio.output(pin_sleep, sleepOFF)
 ##    gpio.output(pin_directionVertical, directionDown)
 ##    gpio.output(pin_directionVerticalRight, directionDown)
-##    for x in range(0,99):
-##        #while(buttonHeld == True)
+##    for x in range(0,dist-1):
 ##            gpio.output(pin_stepVertical, 0)
 ##            gpio.output(pin_stepVerticalRight, 0)
 ##            time.sleep(sleeptime/2)
@@ -152,16 +200,12 @@ def stepDown():
 ##            gpio.output(pin_stepVerticalRight, 1)
 ##            time.sleep(sleeptime/2)
 ##    gpio.output(pin_sleep,
-    print("Step down")
+    print("Old vertical position: %s" % (pos_steps_vert) )
+    pos_steps_vert = pos_step_vert - dist
+    print("New horizontal position: %s" % (pos_steps_vert) )
 
-def donothing():    # Do nothing
-    print("Do nothing")
+    
 
-def calibrate():
-    print("Insert positional calibration function here.")
-
-def goto(point):
-    print("Go to point %s" % (point) )
 
 def manual():       # Open the manual controls mneu
     manual_menu = Toplevel(top)
@@ -274,6 +318,8 @@ def options():      # Open the options menu
 
 
 # Begin main program here
+calibrate()
+
 top = tkinter.Tk()
 top.title(title_top)
 top.geometry(menusize)
