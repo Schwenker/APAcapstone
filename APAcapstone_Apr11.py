@@ -1,4 +1,4 @@
-## Updated: Apr 10, 2017
+## Updated: Apr 11, 2017
 ## To do:
 ## Add button + entry-box for arbitrary lie-angles 
 ## Add entry box to choose move distance per press of manual direction buttons
