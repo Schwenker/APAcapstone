@@ -1,16 +1,16 @@
-## Updated: Apr 10, 2017
+## Updated: Apr 11, 2017
 ## To do:
 ## Add label to lie-angle buttons
 ## Add button + entry-box for arbitrary lie-angles 
 ## Add entry box to choose move distance per press of manual direction buttons
+## Assess why angle rotation not registering
 ## Fill in placeholder functions to control the pendulum
-## Add dynamic lable for current position in mm to manual control menu
 
-#import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 import time
 import sys
 import math
-#import numpy as np
+import numpy as np
 from functools import partial
 
 import tkinter
@@ -24,6 +24,8 @@ from tkinter import *
 # Conversion ratios: milimeters -> steps
 mm2steps_horiz = 25
 mm2steps_vert = 25
+steps2mm_horiz = 1/mm2steps_horiz
+steps2mm_vert = 1/mm2steps_vert
 
 # GUI sizes and colors
 menusize = '800x450-0+0'
@@ -71,153 +73,154 @@ directionPendRaise = 0
 directionPendLower = 1
 
 # Initialize pinouts
-##gpio.setmode(gpio.BOARD)
-##gpio.setup(pin_sleep, gpio.OUT)
-##gpio.setup(pin_directionHorizontal, gpio.OUT)
-##gpio.setup(pin_directionVertical, gpio.OUT)
-##gpio.setup(pin_directionVerticalRight, gpio.OUT)
-##gpio.setup(pin_directionPendulum, gpio.OUT)
-##gpio.setup(pin_stepHorizontal, gpio.OUT)
-##gpio.setup(pin_stepVertical, gpio.OUT)
-##gpio.setup(pin_stepVerticalRight, gpio.OUT)
-##gpio.setup(pin_stepPendulum, gpio.OUT)
-##
-##gpio.output(pin_sleep, sleepON)
+gpio.setmode(gpio.BOARD)
+gpio.setup(pin_sleep, gpio.OUT)
+gpio.setup(pin_directionHorizontal, gpio.OUT)
+gpio.setup(pin_directionVertical, gpio.OUT)
+gpio.setup(pin_directionVerticalRight, gpio.OUT)
+gpio.setup(pin_directionPendulum, gpio.OUT)
+gpio.setup(pin_stepHorizontal, gpio.OUT)
+gpio.setup(pin_stepVertical, gpio.OUT)
+gpio.setup(pin_stepVerticalRight, gpio.OUT)
+gpio.setup(pin_stepPendulum, gpio.OUT)
+
+gpio.output(pin_sleep, sleepON)
 
 # Create the maps for point positions in mm from center
 # Common lie angles at address are 15, 16, and 17 degrees
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
-##pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
-##ang = math.radians(-15)
-##rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
-##pts15_mm = np.matmul(rotator, pts0_mm)
-##ang = math.radians(-1)
-##rotator = [[math.cos(ang), math.sin(ang)],
-##                     [-(math.sin(ang)), math.cos(ang)]]
-##pts16_mm = np.matmul(rotator, pts15_mm)
-##pts17_mm = np.matmul(rotator, pts16_mm)
-##ptsother_mm = pts0_mm
-##
-##pts15_steps = pts15_mm
-##pts15_steps[0][:] *= mm2steps_horiz
-##pts15_steps[1][:] *= mm2steps_vert
-##pts15_steps[:][:] = np.round(pts15_steps[:][:])
-##pts15_steps = pts15_steps.astype(int)
-##
-##pts16_steps = pts16_mm
-##pts16_steps[0][:] *= mm2steps_horiz
-##pts16_steps[1][:] *= mm2steps_vert
-##pts16_steps[:][:] = np.round(pts16_steps[:][:])
-##pts16_steps = pts16_steps.astype(int)
-##
-##pts17_steps = pts17_mm
-##pts17_steps[0][:] *= mm2steps_horiz
-##pts17_steps[1][:] *= mm2steps_vert
-##pts17_steps[:][:] = np.round(pts17_steps[:][:])
-##pts17_steps = pts17_steps.astype(int)
-##
-##ptsother_steps = ptsother_mm
-##
-##ptsCurrent_steps = pts15_steps
-##cp_steps = np.matrix('0; 0') # Current position in steps
+pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
+ang = math.radians(-15)
+rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+pts15_mm = np.matmul(rotator, pts0_mm)
+ang = math.radians(-1)
+rotator = [[math.cos(ang), math.sin(ang)],
+                     [-(math.sin(ang)), math.cos(ang)]]
+pts16_mm = np.matmul(rotator, pts15_mm)
+pts17_mm = np.matmul(rotator, pts16_mm)
+ptsother_mm = pts0_mm
+
+pts15_steps = pts15_mm
+pts15_steps[0][:] *= mm2steps_horiz
+pts15_steps[1][:] *= mm2steps_vert
+pts15_steps[:][:] = np.round(pts15_steps[:][:])
+pts15_steps = pts15_steps.astype(int)
+
+pts16_steps = pts16_mm
+pts16_steps[0][:] *= mm2steps_horiz
+pts16_steps[1][:] *= mm2steps_vert
+pts16_steps[:][:] = np.round(pts16_steps[:][:])
+pts16_steps = pts16_steps.astype(int)
+
+pts17_steps = pts17_mm
+pts17_steps[0][:] *= mm2steps_horiz
+pts17_steps[1][:] *= mm2steps_vert
+pts17_steps[:][:] = np.round(pts17_steps[:][:])
+pts17_steps = pts17_steps.astype(int)
+
+ptsother_steps = ptsother_mm
+ptsCurrent_steps = pts15_steps
+cp_steps = np.matrix('0; 0') # Current position in steps
+
 
 def donothing():    # Do nothing
     print("Do nothing")
 
 def calibrate():
-##    cp_steps=np.matrix('0; 0')
-    print("Calibrated")
-
+    cp_steps[0,0] = 0
+    cp_steps[1,0] = 0
+    print("cp_steps=%s" %cp_steps)
 def rotate(angle): # Positive angle is counterclockwise
     print("Lie angle: %s deg" %angle)
-##    if angle==15:
-##        ptsCurrent_steps = pts15_steps
-##    elif angle==16:
-##        ptsCurrent_steps = pts16_steps
-##    elif angle==17:
-##        ptsCurrent_steps = pts17_steps
-##    else:
-##        ang = math.radians(-angle)
-##        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                         [-(math.sin(ang)), math.cos(ang)]])
-##        ptsother_mm = np.matmul(rotator, pts0_mm)
-##        ptsother_steps = ptsother_mm
-##        ptsother_steps[0][:] *= mm2steps_horiz
-##        ptsother_steps[1][:] *= mm2steps_vert
-##        ptsother_steps[:][:] = np.round(pts17_steps[:][:])
-##        ptsother_steps = ptsother_steps.astype(int)
-##        ptsCurrent_steps = ptsother_steps   
+    if angle==15:
+        ptsCurrent_steps = pts15_steps
+    elif angle==16:
+        ptsCurrent_steps = pts16_steps
+    elif angle==17:
+        ptsCurrent_steps = pts17_steps
+    else:
+        ang = math.radians(-angle)
+        rotator = np.matrix([[math.cos(ang), math.sin(ang)],
+                         [-(math.sin(ang)), math.cos(ang)]])
+        ptsother_mm = np.matmul(rotator, pts0_mm)
+        ptsother_steps = ptsother_mm
+        ptsother_steps[0][:] *= mm2steps_horiz
+        ptsother_steps[1][:] *= mm2steps_vert
+        ptsother_steps[:][:] = np.round(pts17_steps[:][:])
+        ptsother_steps = ptsother_steps.astype(int)
+        ptsCurrent_steps = ptsother_steps   
 
-def stepLeft(dist=100):
-    print("Step left: %s steps" %dist)
-##    cp_steps[0,0] += dist
-##    if dist < 0:
-##        dist *= -1      
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionHorizontal, directionLeft)
-##      for x in range(dist):
-##            gpio.output(pin_stepHorizontal, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepHorizontal, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+def stepLeft(dist=-100):
+    cp_steps[0,0] += dist
+    updateLabel()
+    if dist < 0:
+        dist *= -1      
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionHorizontal, directionLeft)
+    for x in range(dist):
+            gpio.output(pin_stepHorizontal, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepHorizontal, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 def stepRight(dist=100):
-        print("Step right: %s steps" %dist)
-##    cp_steps[0,0] += dist
-##    if dist < 0:
-##        dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionHorizontal, directionRight)
-##    for x in range(dist):
-##            gpio.output(pin_stepHorizontal, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepHorizontal, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    cp_steps[0,0] += dist
+    updateLabel()
+    if dist < 0:
+        dist *= -1
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionHorizontal, directionRight)
+    for x in range(dist):
+            gpio.output(pin_stepHorizontal, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepHorizontal, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 def stepUp(dist=100):
-        print("Step up: %s steps" %dist)
-##    cp_steps[1,0] += dist
-##    if dist < 0:
-##        dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionVertical, directionUp)
-##    gpio.output(pin_directionVerticalRight, directionUp)
-##    for x in range(dist):
-##            gpio.output(pin_stepVertical, 0)
-##            gpio.output(pin_stepVerticalRight, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepVertical, 1)
-##            gpio.output(pin_stepVerticalRight, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
-def stepDown(dist=100):
-        print("Step down: %s steps" %dist)
-##    cp_steps[1,0] += dist
-##    if dist < 0:
-##        dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionVertical, directionDown)
-##    gpio.output(pin_directionVerticalRight, directionDown)
-##    for x in range(dist):
-##            gpio.output(pin_stepVertical, 0)
-##            gpio.output(pin_stepVerticalRight, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepVertical, 1)
-##            gpio.output(pin_stepVerticalRight, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON) 
+    cp_steps[1,0] += dist
+    updateLabel()
+    if dist < 0:
+        dist *= -1
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionVertical, directionUp)
+    gpio.output(pin_directionVerticalRight, directionUp)
+    for x in range(dist):
+            gpio.output(pin_stepVertical, 0)
+            gpio.output(pin_stepVerticalRight, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepVertical, 1)
+            gpio.output(pin_stepVerticalRight, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
+def stepDown(dist=-100):
+    cp_steps[1,0] += dist
+    updateLabel()
+    if dist < 0:
+        dist *= -1
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionVertical, directionDown)
+    gpio.output(pin_directionVerticalRight, directionDown)
+    for x in range(dist):
+            gpio.output(pin_stepVertical, 0)
+            gpio.output(pin_stepVerticalRight, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepVertical, 1)
+            gpio.output(pin_stepVerticalRight, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
+    
 def goto(point):
     print("Go to point: %s" %point)
-##    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
-##    if dist[0,0] < 0:
-##        stepLeft(dist[0,0])
-##    elif dist[0,0] > 0:
-##        stepRight(dist[0,0])
-##    if dist[1,0] < 0:
-##        stepDown(dist[1,0])
-##    elif dist[1,0] > 0:
-##        stepUp(dist[1,0])  
+    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
+    if dist[0,0] < 0:
+        stepLeft(dist[0,0])
+    elif dist[0,0] > 0:
+        stepRight(dist[0,0])
+    if dist[1,0] < 0:
+        stepDown(dist[1,0])
+    elif dist[1,0] > 0:
+        stepUp(dist[1,0])  
 
 def raisePend(height):
     print("Raise pendulum to height: %s" %height)
@@ -264,8 +267,7 @@ def fullMap_test():
         
     
     
-
-def manual():       # Open the manual controls menu
+def manual():
     manual_menu = Toplevel(top)
     manual_menu.title(title_manual)
     manual_menu.geometry(menusize)
@@ -276,6 +278,7 @@ def manual():       # Open the manual controls menu
         if messagebox.askyesno(title_calibrate, message_calibrate, parent=manual_menu) == True:
            #function(return): askquestion('yes' or 'no'), askokcancel(true or false), askyesno(true or false)
             calibrate()
+            updateLabel()
         else:
             pass
     def manual_goto():
@@ -307,11 +310,12 @@ def manual():       # Open the manual controls menu
     manual_backButton = tkinter.Button(manual_menu, text="<-", bg=buttonColor, activebackground=bColor_active, command=manual_back)
     manual_backButton.pack()
     manual_backButton.place(anchor=NW, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
-    ##########################################3
+    
     # Left button in the manual control menu
     manual_leftButton = tkinter.Button(manual_menu, text = "Left", bg = buttonColor, activebackground=bColor_active, command=stepLeft)
     manual_leftButton.pack()
     manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    #manual_leftButton.bind('<1>', updateLabel)
     #B4.bind('<Button-1>',stepLeft)
     #B4.bind('ButtonRelease-1',buttonOff)
     # Right button in the manual control menu
@@ -323,9 +327,13 @@ def manual():       # Open the manual controls menu
     manual_upButton.pack()
     manual_upButton.place(relx=(1-buttonsize_relative)/2, rely=0, relheight=buttonsize_relative, relwidth=buttonsize_relative)
     # Down button in the manual control menu
-    manual_downButton = tkinter.Button(manual_menu, text="Down", bg=buttonColor, activebackground=bColor_active, command = stepDown)
+    manual_downButton = tkinter.Button(manual_menu, text="Down", bg=buttonColor, activebackground=bColor_active, command=stepDown)
     manual_downButton.pack()
     manual_downButton.place(relx=(1-buttonsize_relative)/2, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    
+    Label(manual_menu, textvariable=cp_mm_label, bd=0).place(relx=0.5, rely=buttonsize_relative*2, anchor=N)
+
+    
     # Button to open the Go-to-a-point menu
     manual_gotoButton = tkinter.Button(manual_menu, text="Go to position", bg=buttonColor, activebackground=bColor_active, command = manual_goto)
     manual_gotoButton.pack()
@@ -341,6 +349,7 @@ def options():      # Open the options menu
     def options_calibrate():
         if messagebox.askyesno(title_calibrate, message_calibrate, parent=options_menu) == True:
             calibrate()
+            updateLabel()
         else:
             pass
     def changeColor():
@@ -381,6 +390,13 @@ top = tkinter.Tk()
 top.title(title_top)
 top.geometry(menusize)
 top.resizable(FALSE,FALSE)
+
+def updateLabel():
+        cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
+cp_mm_label = StringVar()
+updateLabel()
+
+
 # Button to open the manual control menu
 manual_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Manual Control", bg=buttonColor, activebackground=bColor_active, command = manual)
 manual_button.pack()
@@ -405,4 +421,4 @@ single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
 top.mainloop()
-#gpio.cleanup()
+gpio.cleanup()
