@@ -1,9 +1,7 @@
-## Updated: Apr 11, 2017
+## Updated: Apr 10, 2017
 ## To do:
-## Add label to lie-angle buttons
 ## Add button + entry-box for arbitrary lie-angles 
 ## Add entry box to choose move distance per press of manual direction buttons
-## Assess why angle rotation not registering
 ## Fill in placeholder functions to control the pendulum
 
 import RPi.GPIO as gpio
@@ -49,7 +47,7 @@ title_options = 'Options'
 
 sleeptime = 2/1000 # In seconds
 
-# Physical pins (as opposed to standard GPIO naming)
+# RPi physical pins
 pin_stepHorizontal = 11
 pin_stepVertical = 15
 pin_stepVerticalRight = 18
@@ -84,9 +82,10 @@ gpio.setup(pin_stepVertical, gpio.OUT)
 gpio.setup(pin_stepVerticalRight, gpio.OUT)
 gpio.setup(pin_stepPendulum, gpio.OUT)
 
+# Initialize sleep mode
 gpio.output(pin_sleep, sleepON)
 
-# Create the maps for point positions in mm from center
+# Map test point positions in mm from center
 # Common lie angles at address are 15, 16, and 17 degrees
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
@@ -121,18 +120,22 @@ pts17_steps = pts17_steps.astype(int)
 
 ptsother_steps = ptsother_mm
 ptsCurrent_steps = pts15_steps
-cp_steps = np.matrix('0; 0') # Current position in steps
+
+# Initialize current position in steps from center
+cp_steps = np.matrix('0; 0')
 
 
 def donothing():    # Do nothing
     print("Do nothing")
 
+# Reset position tracker to (0,0)
 def calibrate():
     cp_steps[0,0] = 0
     cp_steps[1,0] = 0
-    print("cp_steps=%s" %cp_steps)
-def rotate(angle): # Positive angle is counterclockwise
-    print("Lie angle: %s deg" %angle)
+# Swicth golfclub lie angles
+def rotate(angle=15): # Positive angle is counterclockwise
+    updateLabel_angle(angle)
+    global ptsCurrent_steps
     if angle==15:
         ptsCurrent_steps = pts15_steps
     elif angle==16:
@@ -150,10 +153,10 @@ def rotate(angle): # Positive angle is counterclockwise
         ptsother_steps[:][:] = np.round(pts17_steps[:][:])
         ptsother_steps = ptsother_steps.astype(int)
         ptsCurrent_steps = ptsother_steps   
-
+# Move left
 def stepLeft(dist=-100):
     cp_steps[0,0] += dist
-    updateLabel()
+    updateLabel_cp()
     if dist < 0:
         dist *= -1      
     gpio.output(pin_sleep, sleepOFF)
@@ -164,9 +167,10 @@ def stepLeft(dist=-100):
             gpio.output(pin_stepHorizontal, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
+# Move right
 def stepRight(dist=100):
     cp_steps[0,0] += dist
-    updateLabel()
+    updateLabel_cp()
     if dist < 0:
         dist *= -1
     gpio.output(pin_sleep, sleepOFF)
@@ -177,9 +181,10 @@ def stepRight(dist=100):
             gpio.output(pin_stepHorizontal, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
+# Move up
 def stepUp(dist=100):
     cp_steps[1,0] += dist
-    updateLabel()
+    updateLabel_cp()
     if dist < 0:
         dist *= -1
     gpio.output(pin_sleep, sleepOFF)
@@ -193,9 +198,10 @@ def stepUp(dist=100):
             gpio.output(pin_stepVerticalRight, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
+# Move down
 def stepDown(dist=-100):
     cp_steps[1,0] += dist
-    updateLabel()
+    updateLabel_cp()
     if dist < 0:
         dist *= -1
     gpio.output(pin_sleep, sleepOFF)
@@ -209,7 +215,7 @@ def stepDown(dist=-100):
             gpio.output(pin_stepVerticalRight, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
-    
+# Go to a specific test point 
 def goto(point):
     print("Go to point: %s" %point)
     dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
@@ -221,13 +227,15 @@ def goto(point):
         stepDown(dist[1,0])
     elif dist[1,0] > 0:
         stepUp(dist[1,0])  
-
+# Raise the pendulum by 'height' number of steps
 def raisePend(height):
     print("Raise pendulum to height: %s" %height)
     time.sleep(1)
+# Drop the pendulum
 def dropPend():
     print("Drop pendulum")
     time.sleep(.5)
+# Test the current test point
 def testPend():
     raisePend("low")
     dropPend()
@@ -235,7 +243,7 @@ def testPend():
     dropPend()
     raisePend("high")
     dropPend()
-
+# Test the 5 most at-risk test points
 def RnD_test():
     goto(18)
     testPend()
@@ -247,7 +255,7 @@ def RnD_test():
     testPend()
     goto(2)
     testPend()
-    
+# Test all test points (takes a while to complete)
 def fullMap_test():
     for pt in range(0, 9, 1):
         goto(pt)
@@ -266,7 +274,7 @@ def fullMap_test():
         testPend()
         
     
-    
+# Open the manual cotrol GUI
 def manual():
     manual_menu = Toplevel(top)
     manual_menu.title(title_manual)
@@ -278,7 +286,7 @@ def manual():
         if messagebox.askyesno(title_calibrate, message_calibrate, parent=manual_menu) == True:
            #function(return): askquestion('yes' or 'no'), askokcancel(true or false), askyesno(true or false)
             calibrate()
-            updateLabel()
+            updateLabel_cp()
         else:
             pass
     def manual_goto():
@@ -310,12 +318,10 @@ def manual():
     manual_backButton = tkinter.Button(manual_menu, text="<-", bg=buttonColor, activebackground=bColor_active, command=manual_back)
     manual_backButton.pack()
     manual_backButton.place(anchor=NW, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
-    
     # Left button in the manual control menu
     manual_leftButton = tkinter.Button(manual_menu, text = "Left", bg = buttonColor, activebackground=bColor_active, command=stepLeft)
     manual_leftButton.pack()
     manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    #manual_leftButton.bind('<1>', updateLabel)
     #B4.bind('<Button-1>',stepLeft)
     #B4.bind('ButtonRelease-1',buttonOff)
     # Right button in the manual control menu
@@ -333,7 +339,6 @@ def manual():
     
     Label(manual_menu, textvariable=cp_mm_label, bd=0).place(relx=0.5, rely=buttonsize_relative*2, anchor=N)
 
-    
     # Button to open the Go-to-a-point menu
     manual_gotoButton = tkinter.Button(manual_menu, text="Go to position", bg=buttonColor, activebackground=bColor_active, command = manual_goto)
     manual_gotoButton.pack()
@@ -342,14 +347,15 @@ def manual():
     manual_calibrateButton = tkinter.Button(manual_menu, text = "Calibrate\nClub Position", bg=buttonColor, activebackground=bColor_active, command=manual_calibrate)
     manual_calibrateButton.pack()
     manual_calibrateButton.place(relx=1-buttonsize_relative/2, rely=0, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
-def options():      # Open the options menu
+# Open the options GUI menu
+def options():
     options_menu = Toplevel(top)
     options_menu.title(title_options)
     options_menu.geometry(menusize)
     def options_calibrate():
         if messagebox.askyesno(title_calibrate, message_calibrate, parent=options_menu) == True:
             calibrate()
-            updateLabel()
+            updateLabel_cp()
         else:
             pass
     def changeColor():
@@ -380,6 +386,7 @@ def options():      # Open the options menu
     options_pts17Btn = tkinter.Button(options_menu, text="17\nDegrees", bg=buttonColor, activebackground=bColor_active, command=lambda i=17: rotate(i) )
     options_pts17Btn.pack()
     options_pts17Btn.place(relx=(1-buttonsize_relative)/2+buttonsize_relative*3/4, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    Label(options_menu, textvariable=angleLabel, bd=0).place(relx=0.5, rely=1-buttonsize_relative, anchor=S)
 
     
 
@@ -391,11 +398,14 @@ top.title(title_top)
 top.geometry(menusize)
 top.resizable(FALSE,FALSE)
 
-def updateLabel():
-        cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
+def updateLabel_cp():
+    cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
 cp_mm_label = StringVar()
-updateLabel()
-
+updateLabel_cp()
+def updateLabel_angle(angle):
+    angleLabel.set("Lie angle at address: %s degrees" %angle)
+angleLabel = StringVar()
+updateLabel_angle(15)
 
 # Button to open the manual control menu
 manual_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Manual Control", bg=buttonColor, activebackground=bColor_active, command = manual)
