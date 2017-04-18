@@ -27,9 +27,9 @@ steps2mm_horiz = 1/mm2steps_horiz
 steps2mm_vert = 1/mm2steps_vert
 
 # Pendulum heights in motor steps
-pend_lowHeight = 900
-pend_medHeight = 1725
-pend_highHeight = 2650
+pend_lowHeight = 1000
+pend_medHeight = 1900
+pend_highHeight = 2750
 
 # Servo settings
 freq_servo = 50 # in Hz
@@ -284,20 +284,23 @@ def grabPend():
 def testPend():
     # Low height
     grabPend()
-    time.sleep(0.5)
+    time.sleep(0.3)
     raisePend(pend_lowHeight)
+    time.sleep(0.3)
     dropPend()
     lowerPend(pendPos_steps)
     # Medium height
     grabPend()
-    time.sleep(0.5)
+    time.sleep(0.3)
     raisePend(pend_medHeight)
+    time.sleep(0.3)
     dropPend()
     lowerPend(pendPos_steps)
     # High height
     grabPend()
-    time.sleep(0.5)
+    time.sleep(0.3)
     raisePend(pend_highHeight)
+    time.sleep(0.3)
     dropPend()
     lowerPend(pendPos_steps)
 # Test the 5 most at-risk test points
