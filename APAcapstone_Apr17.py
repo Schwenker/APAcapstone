@@ -27,9 +27,14 @@ steps2mm_horiz = 1/mm2steps_horiz
 steps2mm_vert = 1/mm2steps_vert
 
 # Pendulum heights in motor steps
-pend_lowHeight = 1000
-pend_medHeight = 2000
-pend_highHeight = 3000
+pend_lowHeight = 900
+pend_medHeight = 1725
+pend_highHeight = 2650
+
+# Servo settings
+freq_servo = 50 # in Hz
+servoPos_dropped = 3
+servoPos_grabbed = 5
 
 # GUI sizes and colors
 menusize = '800x450-0+0'
@@ -58,6 +63,7 @@ pin_stepHorizontal = 11
 pin_stepVertical = 15
 pin_stepVerticalRight = 18
 pin_stepPendulum = 29
+pin_grabPendulum = 12
 
 pin_directionHorizontal = 13
 pin_directionVertical = 16
@@ -83,6 +89,7 @@ gpio.setup(pin_directionHorizontal, gpio.OUT)
 gpio.setup(pin_directionVertical, gpio.OUT)
 gpio.setup(pin_directionVerticalRight, gpio.OUT)
 gpio.setup(pin_directionPendulum, gpio.OUT)
+gpio.setup(pin_grabPendulum, gpio.OUT)
 gpio.setup(pin_stepHorizontal, gpio.OUT)
 gpio.setup(pin_stepVertical, gpio.OUT)
 gpio.setup(pin_stepVerticalRight, gpio.OUT)
@@ -260,32 +267,43 @@ def lowerPend(height=100):
     gpio.output(pin_sleep, sleepON)
     print("Pendulum position: %s" %pendPos_steps)
 # Drop the pendulum
+pwm = gpio.PWM(pin_grabPendulum, freq_servo)
+pwm.start(servoPos_dropped)
+time.sleep(.5)
+pwm.ChangeDutyCycle(0)
 def dropPend():
-    print("Drop pendulum")
-    time.sleep(.1)
+    pwm.ChangeDutyCycle(servoPos_dropped)
+    time.sleep(.5)
+    pwm.ChangeDutyCycle(0)
 # Grab the pendulum
 def grabPend():
-    print("Grab pendulum")
-    time.sleep(.1)
+    pwm.ChangeDutyCycle(servoPos_grabbed)
+    time.sleep(.5)
+    pwm.ChangeDutyCycle(0)
 # Test the current test point
 def testPend():
     # Low height
+    grabPend()
+    time.sleep(0.5)
     raisePend(pend_lowHeight)
     dropPend()
     lowerPend(pendPos_steps)
-    grabPend()
     # Medium height
+    grabPend()
+    time.sleep(0.5)
     raisePend(pend_medHeight)
     dropPend()
     lowerPend(pendPos_steps)
-    grabPend()
     # High height
+    grabPend()
+    time.sleep(0.5)
     raisePend(pend_highHeight)
     dropPend()
     lowerPend(pendPos_steps)
-    grabPend()
 # Test the 5 most at-risk test points
 def RnD_test():
+    goto(22)
+    testPend()
     goto(18)
     testPend()
     goto(26)
