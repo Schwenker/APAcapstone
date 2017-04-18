@@ -1,5 +1,6 @@
-## Updated: Apr 11, 2017
+## Updated: Apr 17, 2017
 ## To do:
+## 
 ## Add button + entry-box for arbitrary lie-angles 
 ## Add entry box to choose move distance per press of manual direction buttons
 ## Fill in placeholder functions to control the pendulum
@@ -24,6 +25,11 @@ mm2steps_horiz = 25
 mm2steps_vert = 25
 steps2mm_horiz = 1/mm2steps_horiz
 steps2mm_vert = 1/mm2steps_vert
+
+# Pendulum heights in motor steps
+pend_lowHeight = 1000
+pend_medHeight = 2000
+pend_highHeight = 3000
 
 # GUI sizes and colors
 menusize = '800x450-0+0'
@@ -51,7 +57,7 @@ sleeptime = 2/1000 # In seconds
 pin_stepHorizontal = 11
 pin_stepVertical = 15
 pin_stepVerticalRight = 18
-pin_stepPendulum = 19
+pin_stepPendulum = 29
 
 pin_directionHorizontal = 13
 pin_directionVertical = 16
@@ -67,8 +73,8 @@ directionLeft = 1
 directionRight = 0
 directionUp = 1
 directionDown = 0
-directionPendRaise = 0
-directionPendLower = 1
+directionPendRaise = 1
+directionPendLower = 0
 
 # Initialize pinouts
 gpio.setmode(gpio.BOARD)
@@ -90,10 +96,10 @@ gpio.output(pin_sleep, sleepON)
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
 pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
-ang = math.radians(-15)
+ang = math.radians(-90+15)
 rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
 pts15_mm = np.matmul(rotator, pts0_mm)
-ang = math.radians(-1)
+ang = math.radians(1)
 rotator = [[math.cos(ang), math.sin(ang)],
                      [-(math.sin(ang)), math.cos(ang)]]
 pts16_mm = np.matmul(rotator, pts15_mm)
@@ -122,7 +128,8 @@ ptsother_steps = ptsother_mm
 ptsCurrent_steps = pts15_steps
 
 # Initialize current position in steps from center
-cp_steps = np.matrix('0; 0')
+cp_steps = np.matrix('0; 0') # Current position
+pendPos_steps = 0 # Pendulum postion
 
 
 def donothing():    # Do nothing
@@ -143,7 +150,7 @@ def rotate(angle=15): # Positive angle is counterclockwise
     elif angle==17:
         ptsCurrent_steps = pts17_steps
     else:
-        ang = math.radians(-angle)
+        ang = math.radians(-90+angle)
         rotator = np.matrix([[math.cos(ang), math.sin(ang)],
                          [-(math.sin(ang)), math.cos(ang)]])
         ptsother_mm = np.matmul(rotator, pts0_mm)
@@ -228,21 +235,55 @@ def goto(point):
     elif dist[1,0] > 0:
         stepUp(dist[1,0])  
 # Raise the pendulum by 'height' number of steps
-def raisePend(height):
-    print("Raise pendulum to height: %s" %height)
-    time.sleep(1)
+def raisePend(height=100):
+    global pendPos_steps
+    pendPos_steps += height      
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionPendulum, directionPendRaise) 
+    for x in range(height):
+            gpio.output(pin_stepPendulum, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepPendulum, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
+    print("Pendulum position: %s" %pendPos_steps)
+def lowerPend(height=100):
+    global pendPos_steps
+    pendPos_steps -= height      
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionPendulum, directionPendLower) 
+    for x in range(height):
+            gpio.output(pin_stepPendulum, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepPendulum, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
+    print("Pendulum position: %s" %pendPos_steps)
 # Drop the pendulum
 def dropPend():
     print("Drop pendulum")
-    time.sleep(.5)
+    time.sleep(.1)
+# Grab the pendulum
+def grabPend():
+    print("Grab pendulum")
+    time.sleep(.1)
 # Test the current test point
 def testPend():
-    raisePend("low")
+    # Low height
+    raisePend(pend_lowHeight)
     dropPend()
-    raisePend("med")
+    lowerPend(pendPos_steps)
+    grabPend()
+    # Medium height
+    raisePend(pend_medHeight)
     dropPend()
-    raisePend("high")
+    lowerPend(pendPos_steps)
+    grabPend()
+    # High height
+    raisePend(pend_highHeight)
     dropPend()
+    lowerPend(pendPos_steps)
+    grabPend()
 # Test the 5 most at-risk test points
 def RnD_test():
     goto(18)
@@ -431,4 +472,4 @@ single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
 top.mainloop()
-gpio.cleanup()
+#gpio.cleanup()
