@@ -1,9 +1,12 @@
-## Updated: Apr 17, 2017
+## Updated: Apr 20, 2017
 ## To do:
-## 
 ## Add button + entry-box for arbitrary lie-angles 
-## Add entry box to choose move distance per press of manual direction buttons
-## Fill in placeholder functions to control the pendulum
+## Add slider or buttons to choose move distance per press of manual direction buttons
+## Add a cancel button for tests
+## Add time estimates to test button labels
+## Add manual control buttons for pendulum height and grabbing/releasing pendulum
+## Finish debugging progress label for tests
+## Add easy-click icon to desktop to run the proram
 
 import RPi.GPIO as gpio
 import time
@@ -31,6 +34,14 @@ pend_lowHeight = 1000
 pend_medHeight = 1900
 pend_highHeight = 2750
 
+# Common testing points
+toe20 = 26
+heel20 = 18
+low10 = 4
+high10 = 40
+toe10high10 = 42
+center = 22
+
 # Servo settings
 freq_servo = 50 # in Hz
 servoPos_dropped = 3
@@ -43,13 +54,10 @@ buttonheight = 4
 buttonsize_relative = 0.3
 gotogrid_offset_x = 55
 gotogrid_offset_y = 80
-# Logo gold = "#d4bc20"
-buttonColor = "#ffd700" #also gold
-bColor_active = "#000000000"    #Pure black
-dotColor = ((0.0, 255.99609375, 0.0), '#00ff00')
 
-# Messages and titles
-message_calibrate = "Make sure the golf clubface is centered before calibrating. This cannot be undone.\n\n Do you want to continue?"
+# Logo gold = "#d4bc20"
+buttonColor = "#ffd700" # Also gold
+bColor_active = "#22bb22" # Forest green
 title_top = 'Automated Clubface CT Tester'
 title_calibrate = "Positional Calibration"
 title_manual = 'Manual Control'
@@ -231,7 +239,6 @@ def stepDown(dist=-100):
     gpio.output(pin_sleep, sleepON)
 # Go to a specific test point 
 def goto(point):
-    print("Go to point: %s" %point)
     dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
     if dist[0,0] < 0:
         stepLeft(dist[0,0])
@@ -253,7 +260,6 @@ def raisePend(height=100):
             gpio.output(pin_stepPendulum, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
-    print("Pendulum position: %s" %pendPos_steps)
 def lowerPend(height=100):
     global pendPos_steps
     pendPos_steps -= height      
@@ -265,7 +271,6 @@ def lowerPend(height=100):
             gpio.output(pin_stepPendulum, 1)
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
-    print("Pendulum position: %s" %pendPos_steps)
 # Drop the pendulum
 pwm = gpio.PWM(pin_grabPendulum, freq_servo)
 pwm.start(servoPos_dropped)
@@ -305,18 +310,33 @@ def testPend():
     lowerPend(pendPos_steps)
 # Test the 5 most at-risk test points
 def RnD_test():
-    goto(22)
+    progLabel = Label(top, textvariable=progress_label, bd=1)
+    progLabel.place(relx=0.5, rely=0.2, anchor=N)
+    # Center
+    updateLabel_progress(1, 6)
+    goto(center)
     testPend()
-    goto(18)
+    # 20 Toe
+    updateLabel_progress(2, 6)
+    goto(toe20)
     testPend()
-    goto(26)
+    # 10 Low
+    updateLabel_progress(3, 6)
+    goto(low10)
     testPend()
-    goto(40)
+    # 20 Heel
+    updateLabel_progress(4, 6)
+    goto(heel20)
     testPend()
-    goto(4)
+    # 10 High
+    updateLabel_progress(5, 6)
+    goto(high10)
     testPend()
-    goto(2)
+    # 10 Toe / 10 High
+    updateLabel_progress(6, 6)
+    goto(toe10high10)
     testPend()
+    progLabel.destroy()
 # Test all test points (takes a while to complete)
 def fullMap_test():
     for pt in range(0, 9, 1):
@@ -358,6 +378,7 @@ def manual():
         manual_goto_menu.resizable(FALSE,FALSE)
         def manual_goto_back():
             manual_goto_menu.destroy()
+        Label(manual_goto_menu, textvariable=cp_mm_label, bd=0).place(relx=0.5, rely=0.137, anchor=N)
         manual_goto_backButton = tkinter.Button(manual_goto_menu, text="<-", bg=buttonColor,
                                                 activebackground=bColor_active, command=manual_goto_back)
         manual_goto_backButton.pack()
@@ -366,11 +387,36 @@ def manual():
         manual_goto_frame = Frame(manual_goto_menu, height=400, width=480)
         manual_goto_frame.place(x=gotogrid_offset_x, y=gotogrid_offset_y)
         for ctr in range(45):
-            if ctr==22:
-                point_button = Button(manual_goto_menu, text="23\n(Center)", height=buttonheight, width=buttonwidth,
+            if ctr==heel20:
+                point_button = Button(manual_goto_menu, text='19\n"20 Heel"', height=buttonheight, width=buttonwidth,
+                                     bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
+                this_row, this_col = divmod(ctr,9)
+                point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col) 
+            elif ctr==center:
+                point_button = Button(manual_goto_menu, text="%s\nCenter"%(ctr+1), height=buttonheight, width=buttonwidth,
                                      bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)   
+            elif ctr==toe20:
+                point_button = Button(manual_goto_menu, text='%s\n"20 Toe"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                                  bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
+                this_row, this_col = divmod(ctr,9)
+                point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
+            elif ctr==high10:
+                point_button = Button(manual_goto_menu, text='%s\n"10 High"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                                  bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
+                this_row, this_col = divmod(ctr,9)
+                point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
+            elif ctr==low10:
+                point_button = Button(manual_goto_menu, text='%s\n"10 Low"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                                  bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
+                this_row, this_col = divmod(ctr,9)
+                point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
+            elif ctr==toe10high10:
+                point_button = Button(manual_goto_menu, text='%s\n"10 Toe\n10 High"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                                  bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
+                this_row, this_col = divmod(ctr,9)
+                point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
             else:
                 point_button = Button(manual_goto_menu, text=str(ctr+1), height=buttonheight, width=buttonwidth,
                                       bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
@@ -459,7 +505,15 @@ top = tkinter.Tk()
 top.title(title_top)
 top.geometry(menusize)
 top.resizable(FALSE,FALSE)
+##bgImage = PhotoImage(file="/home/pi/Desktop/golf.gif")
+##bgTop = Label(image=bgImage)
+##bgTop.grid(row=0, column=0)
+##bgTop.lower()
 
+def updateLabel_progress(progress=0, total=0):
+    progress_label.set("Testing point %s of %s" %(progress, total))
+    print("Testing point %s of %s" %(progress, total))
+progress_label = StringVar()
 def updateLabel_cp():
     cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
 cp_mm_label = StringVar()
@@ -472,11 +526,11 @@ updateLabel_angle(15)
 # Button to open the manual control menu
 manual_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Manual Control", bg=buttonColor, activebackground=bColor_active, command = manual)
 manual_button.pack()
-manual_button.place(relx=(1-buttonsize_relative)/2, rely=0, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+manual_button.place(relx=0.5-(buttonsize_relative)/2, rely=1, anchor=S, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to open the options menu
 options_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Options", bg=buttonColor, activebackground=bColor_active, command = options)
 options_button.pack()
-options_button.place(relx=(1-buttonsize_relative)/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+options_button.place(relx=0.5+(buttonsize_relative)/2, rely=1, anchor=S, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to run the shortened R&D test
 RnD_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "R&D Standard", bg=buttonColor, activebackground=bColor_active, command=RnD_test)
 RnD_button.pack()
@@ -486,7 +540,7 @@ fullMap_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, tex
 fullMap_button.pack()
 fullMap_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to run the test on the current point
-single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Single Point", bg=buttonColor, activebackground=bColor_active, command = donothing)
+single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Single Point", bg=buttonColor, activebackground=bColor_active, command = testPend)
 single_button.pack()
 single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
