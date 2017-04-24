@@ -1,18 +1,17 @@
 ## Updated: Apr 20, 2017
 ## To do:
 ## Add a cancel button for tests
-## Finish debugging progress label for tests
-## Add time estimates to test button labels
+## Finish debugging progress label for R&D Test
+##      Add progress label for USGA Full Map Test
 ## Add easy-click icon to desktop to run the proram
 ## Add options button to switch to left-handed club (and all underlying support code)
 ## Add button + entry-box for arbitrary lie-angles 
 
-
-import RPi.GPIO as gpio
+##import RPi.GPIO as gpio
 import time
 import sys
 import math
-import numpy as np
+##import numpy as np
 from functools import partial
 
 import tkinter
@@ -93,60 +92,60 @@ directionPendRaise = 1
 directionPendLower = 0
 
 # Initialize pinouts
-gpio.setmode(gpio.BOARD)
-gpio.setup(pin_sleep, gpio.OUT)
-gpio.setup(pin_directionHorizontal, gpio.OUT)
-gpio.setup(pin_directionVertical, gpio.OUT)
-gpio.setup(pin_directionVerticalRight, gpio.OUT)
-gpio.setup(pin_directionPendulum, gpio.OUT)
-gpio.setup(pin_grabPendulum, gpio.OUT)
-gpio.setup(pin_stepHorizontal, gpio.OUT)
-gpio.setup(pin_stepVertical, gpio.OUT)
-gpio.setup(pin_stepVerticalRight, gpio.OUT)
-gpio.setup(pin_stepPendulum, gpio.OUT)
+##gpio.setmode(gpio.BOARD)
+##gpio.setup(pin_sleep, gpio.OUT)
+##gpio.setup(pin_directionHorizontal, gpio.OUT)
+##gpio.setup(pin_directionVertical, gpio.OUT)
+##gpio.setup(pin_directionVerticalRight, gpio.OUT)
+##gpio.setup(pin_directionPendulum, gpio.OUT)
+##gpio.setup(pin_grabPendulum, gpio.OUT)
+##gpio.setup(pin_stepHorizontal, gpio.OUT)
+##gpio.setup(pin_stepVertical, gpio.OUT)
+##gpio.setup(pin_stepVerticalRight, gpio.OUT)
+##gpio.setup(pin_stepPendulum, gpio.OUT)
 
 # Initialize sleep mode
-gpio.output(pin_sleep, sleepON)
+##gpio.output(pin_sleep, sleepON)
 
 # Map test point positions in mm from center
 # Common lie angles at address are 15, 16, and 17 degrees
 # Row 1 is x coordinates (left to right)
 # Row 2 is y coordinates (top to bottom)
-pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
-ang = math.radians(-90+15)
-rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
-pts15_mm = np.matmul(rotator, pts0_mm)
-ang = math.radians(1)
-rotator = [[math.cos(ang), math.sin(ang)],
-                     [-(math.sin(ang)), math.cos(ang)]]
-pts16_mm = np.matmul(rotator, pts15_mm)
-pts17_mm = np.matmul(rotator, pts16_mm)
-ptsother_mm = pts0_mm
-
-pts15_steps = pts15_mm
-pts15_steps[0][:] *= mm2steps_horiz
-pts15_steps[1][:] *= mm2steps_vert
-pts15_steps[:][:] = np.round(pts15_steps[:][:])
-pts15_steps = pts15_steps.astype(int)
-
-pts16_steps = pts16_mm
-pts16_steps[0][:] *= mm2steps_horiz
-pts16_steps[1][:] *= mm2steps_vert
-pts16_steps[:][:] = np.round(pts16_steps[:][:])
-pts16_steps = pts16_steps.astype(int)
-
-pts17_steps = pts17_mm
-pts17_steps[0][:] *= mm2steps_horiz
-pts17_steps[1][:] *= mm2steps_vert
-pts17_steps[:][:] = np.round(pts17_steps[:][:])
-pts17_steps = pts17_steps.astype(int)
-
-ptsother_steps = ptsother_mm
-ptsCurrent_steps = pts15_steps
+##pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
+##ang = math.radians(-90+15)
+##rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+##pts15_mm = np.matmul(rotator, pts0_mm)
+##ang = math.radians(1)
+##rotator = [[math.cos(ang), math.sin(ang)],
+##                     [-(math.sin(ang)), math.cos(ang)]]
+##pts16_mm = np.matmul(rotator, pts15_mm)
+##pts17_mm = np.matmul(rotator, pts16_mm)
+##ptsother_mm = pts0_mm
+##
+##pts15_steps = pts15_mm
+##pts15_steps[0][:] *= mm2steps_horiz
+##pts15_steps[1][:] *= mm2steps_vert
+##pts15_steps[:][:] = np.round(pts15_steps[:][:])
+##pts15_steps = pts15_steps.astype(int)
+##
+##pts16_steps = pts16_mm
+##pts16_steps[0][:] *= mm2steps_horiz
+##pts16_steps[1][:] *= mm2steps_vert
+##pts16_steps[:][:] = np.round(pts16_steps[:][:])
+##pts16_steps = pts16_steps.astype(int)
+##
+##pts17_steps = pts17_mm
+##pts17_steps[0][:] *= mm2steps_horiz
+##pts17_steps[1][:] *= mm2steps_vert
+##pts17_steps[:][:] = np.round(pts17_steps[:][:])
+##pts17_steps = pts17_steps.astype(int)
+##
+##ptsother_steps = ptsother_mm
+##ptsCurrent_steps = pts15_steps
 
 # Initialize current position in steps from center
-cp_steps = np.matrix('0; 0') # Current position
-pendPos_steps = 0 # Pendulum postion
+##cp_steps = np.matrix('0; 0') # Current position
+##pendPos_steps = 0 # Pendulum postion
 
 
 def donothing():    # Do nothing
@@ -155,8 +154,8 @@ def donothing():    # Do nothing
 # Reset position tracker to (0,0)
 def calibrate():
     print("erase this out of claibrate() function")
-    cp_steps[0,0] = 0
-    cp_steps[1,0] = 0
+##    cp_steps[0,0] = 0
+##    cp_steps[1,0] = 0
 
 # Swicth golfclub lie angles
 def rotate(angle=15): # Positive angle is counterclockwise
@@ -183,75 +182,75 @@ def rotate(angle=15): # Positive angle is counterclockwise
 def stepLeft(dist=-100):
     dist = -moveDist_horiz
     print(dist)
-    cp_steps[0,0] += dist
+##    cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1      
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionHorizontal, directionLeft)
-    for x in range(dist):
-            gpio.output(pin_stepHorizontal, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepHorizontal, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionHorizontal, directionLeft)
+##    for x in range(dist):
+##            gpio.output(pin_stepHorizontal, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepHorizontal, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 # Move right
 def stepRight(dist=100):
     dist = moveDist_horiz
     print(dist)
-    cp_steps[0,0] += dist
+##    cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionHorizontal, directionRight)
-    for x in range(dist):
-            gpio.output(pin_stepHorizontal, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepHorizontal, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionHorizontal, directionRight)
+##    for x in range(dist):
+##            gpio.output(pin_stepHorizontal, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepHorizontal, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 # Move up
 def stepUp(dist=100):
     dist = moveDist_vert
     print(dist)
-    cp_steps[1,0] += dist
+##    cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionVertical, directionUp)
-    gpio.output(pin_directionVerticalRight, directionUp)
-    for x in range(dist):
-            gpio.output(pin_stepVertical, 0)
-            gpio.output(pin_stepVerticalRight, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepVertical, 1)
-            gpio.output(pin_stepVerticalRight, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionVertical, directionUp)
+##    gpio.output(pin_directionVerticalRight, directionUp)
+##    for x in range(dist):
+##            gpio.output(pin_stepVertical, 0)
+##            gpio.output(pin_stepVerticalRight, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepVertical, 1)
+##            gpio.output(pin_stepVerticalRight, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 # Move down
 def stepDown(dist=-100):
     dist = -moveDist_vert
     print(dist)
-    cp_steps[1,0] += dist
+##    cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionVertical, directionDown)
-    gpio.output(pin_directionVerticalRight, directionDown)
-    for x in range(dist):
-            gpio.output(pin_stepVertical, 0)
-            gpio.output(pin_stepVerticalRight, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepVertical, 1)
-            gpio.output(pin_stepVerticalRight, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionVertical, directionDown)
+##    gpio.output(pin_directionVerticalRight, directionDown)
+##    for x in range(dist):
+##            gpio.output(pin_stepVertical, 0)
+##            gpio.output(pin_stepVerticalRight, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepVertical, 1)
+##            gpio.output(pin_stepVerticalRight, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 # Go to a specific test point 
 def goto(point):
-    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
+##    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
     if dist[0,0] < 0:
         stepLeft(dist[0,0])
     elif dist[0,0] > 0:
@@ -265,45 +264,45 @@ def raisePend(height=100):
     height = moveDist_pend
     print(height)
     global pendPos_steps
-    pendPos_steps += height      
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionPendulum, directionPendRaise) 
-    for x in range(height):
-            gpio.output(pin_stepPendulum, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepPendulum, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    pendPos_steps += height      
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionPendulum, directionPendRaise) 
+##    for x in range(height):
+##            gpio.output(pin_stepPendulum, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepPendulum, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 def lowerPend(height=100):
     height = moveDist_pend
     print(height)
     global pendPos_steps
-    pendPos_steps -= height      
-    gpio.output(pin_sleep, sleepOFF)
-    gpio.output(pin_directionPendulum, directionPendLower) 
-    for x in range(height):
-            gpio.output(pin_stepPendulum, 0)
-            time.sleep(sleeptime/2)
-            gpio.output(pin_stepPendulum, 1)
-            time.sleep(sleeptime/2)
-    gpio.output(pin_sleep, sleepON)
+##    pendPos_steps -= height      
+##    gpio.output(pin_sleep, sleepOFF)
+##    gpio.output(pin_directionPendulum, directionPendLower) 
+##    for x in range(height):
+##            gpio.output(pin_stepPendulum, 0)
+##            time.sleep(sleeptime/2)
+##            gpio.output(pin_stepPendulum, 1)
+##            time.sleep(sleeptime/2)
+##    gpio.output(pin_sleep, sleepON)
 # Drop the pendulum
-pwm = gpio.PWM(pin_grabPendulum, freq_servo)
-pwm.start(servoPos_dropped)
+##pwm = gpio.PWM(pin_grabPendulum, freq_servo)
+##pwm.start(servoPos_dropped)
 time.sleep(.5)
-pwm.ChangeDutyCycle(0)
+##pwm.ChangeDutyCycle(0)
 def dropPend():
     print("Drop pend")
-    pwm.ChangeDutyCycle(servoPos_dropped)
+##    pwm.ChangeDutyCycle(servoPos_dropped)
     time.sleep(.5)
-    pwm.ChangeDutyCycle(0)
+##    pwm.ChangeDutyCycle(0)
 # Grab the pendulum
 def grabPend():
     print("Grab pend")
-    pwm.ChangeDutyCycle(servoPos_grabbed)
+##    pwm.ChangeDutyCycle(servoPos_grabbed)
     time.sleep(.5)
-    pwm.ChangeDutyCycle(0)
-## Test the current test point
+##    pwm.ChangeDutyCycle(0)
+# Test the current test point
 def testPend():
     # Low height
     grabPend()
@@ -328,7 +327,7 @@ def testPend():
     lowerPend(pendPos_steps)
 # Test the 5 most at-risk test points
 def RnD_test():
-    progLabel = Label(top, textvariable=progress_label, bd=1)
+    progLabel = Label(top, textvariable=progress_label, bd=0)
     progLabel.place(relx=0.5, rely=0.2, anchor=N)
     # Center
     updateLabel_progress(1, 6)
@@ -448,6 +447,8 @@ def manual():
     manual_leftButton = tkinter.Button(manual_menu, text = "Left", bg = buttonColor, activebackground=bColor_active, command=stepLeft)
     manual_leftButton.pack()
     manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    #B4.bind('<Button-1>',stepLeft)
+    #B4.bind('ButtonRelease-1',buttonOff)
     # Right button in the manual control menu
     manual_rightButton = tkinter.Button(manual_menu, text = "Right", bg=buttonColor, activebackground=bColor_active, command = stepRight)
     manual_rightButton.pack()
@@ -497,12 +498,20 @@ def options():
             updateLabel_cp()
         else:
             pass
+    def changeColor():
+        # USE THIS FOR COLOR CALIBRATION
+        dotColor = colorchooser.askcolor(parent=options_menu)
+        print(dotColor)   
     def options_back():
         options_menu.destroy()
     # Back button in the options menu    
     options_backBtn = tkinter.Button(options_menu, text = "<-", bg=buttonColor, activebackground=bColor_active, command = options_back)
     options_backBtn.pack()
     options_backBtn.place(anchor=NW, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
+    # Tracking color chooser button in the options menu
+##    options_colorBtn = tkinter.Button(options_menu, text = "Change Tracking Color", bg=buttonColor, activebackground=bColor_active, command = changeColor)
+##    options_colorBtn.pack()
+##    options_colorBtn.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
     # Position calibration button in the options menu
     options_calibrateBtn = tkinter.Button(options_menu, text = "Calibrate\nClub Position", bg=buttonColor, activebackground=bColor_active, command=options_calibrate)
     options_calibrateBtn.pack()
@@ -568,19 +577,19 @@ options_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, tex
 options_button.pack()
 options_button.place(relx=0.5+(buttonsize_relative)/2, rely=1, anchor=S, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to run the shortened R&D test
-RnD_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "R&D Standard", bg=buttonColor, activebackground=bColor_active, command=RnD_test)
+RnD_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text="R&D Standard\n(9 mins)", bg=buttonColor, activebackground=bColor_active, command=RnD_test)
 RnD_button.pack()
 RnD_button.place(relx=0, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to run the test on every single point
-fullMap_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "USGA Full Map", bg=buttonColor, activebackground=bColor_active, command=fullMap_test)
+fullMap_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "USGA Full Map\n(68 mins)", bg=buttonColor, activebackground=bColor_active, command=fullMap_test)
 fullMap_button.pack()
 fullMap_button.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 # Button to run the test on the current point
-single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Single Point", bg=buttonColor, activebackground=bColor_active, command = testPend)
+single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Single Point\n(2 min)", bg=buttonColor, activebackground=bColor_active, command = testPend)
 single_button.pack()
 single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
 top.mainloop()
-gpio.cleanup()
+#gpio.cleanup()
