@@ -1,12 +1,12 @@
 ## Updated: Apr 20, 2017
 ## To do:
-## Add button + entry-box for arbitrary lie-angles 
-## Add slider or buttons to choose move distance per press of manual direction buttons
 ## Add a cancel button for tests
-## Add time estimates to test button labels
-## Add manual control buttons for pendulum height and grabbing/releasing pendulum
 ## Finish debugging progress label for tests
+## Add time estimates to test button labels
 ## Add easy-click icon to desktop to run the proram
+## Add options button to switch to left-handed club (and all underlying support code)
+## Add button + entry-box for arbitrary lie-angles 
+
 
 import RPi.GPIO as gpio
 import time
@@ -26,8 +26,10 @@ from tkinter import *
 # Conversion ratios: milimeters -> steps
 mm2steps_horiz = 25
 mm2steps_vert = 25
+mm2steps_pend = 25
 steps2mm_horiz = 1/mm2steps_horiz
 steps2mm_vert = 1/mm2steps_vert
+steps2mm_pend = 1/mm2steps_pend
 
 # Pendulum heights in motor steps
 pend_lowHeight = 1000
@@ -152,8 +154,10 @@ def donothing():    # Do nothing
 
 # Reset position tracker to (0,0)
 def calibrate():
+    print("erase this out of claibrate() function")
     cp_steps[0,0] = 0
     cp_steps[1,0] = 0
+
 # Swicth golfclub lie angles
 def rotate(angle=15): # Positive angle is counterclockwise
     updateLabel_angle(angle)
@@ -177,6 +181,8 @@ def rotate(angle=15): # Positive angle is counterclockwise
         ptsCurrent_steps = ptsother_steps   
 # Move left
 def stepLeft(dist=-100):
+    dist = -moveDist_horiz
+    print(dist)
     cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
@@ -191,6 +197,8 @@ def stepLeft(dist=-100):
     gpio.output(pin_sleep, sleepON)
 # Move right
 def stepRight(dist=100):
+    dist = moveDist_horiz
+    print(dist)
     cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
@@ -205,6 +213,8 @@ def stepRight(dist=100):
     gpio.output(pin_sleep, sleepON)
 # Move up
 def stepUp(dist=100):
+    dist = moveDist_vert
+    print(dist)
     cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
@@ -222,6 +232,8 @@ def stepUp(dist=100):
     gpio.output(pin_sleep, sleepON)
 # Move down
 def stepDown(dist=-100):
+    dist = -moveDist_vert
+    print(dist)
     cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
@@ -250,6 +262,8 @@ def goto(point):
         stepUp(dist[1,0])  
 # Raise the pendulum by 'height' number of steps
 def raisePend(height=100):
+    height = moveDist_pend
+    print(height)
     global pendPos_steps
     pendPos_steps += height      
     gpio.output(pin_sleep, sleepOFF)
@@ -261,6 +275,8 @@ def raisePend(height=100):
             time.sleep(sleeptime/2)
     gpio.output(pin_sleep, sleepON)
 def lowerPend(height=100):
+    height = moveDist_pend
+    print(height)
     global pendPos_steps
     pendPos_steps -= height      
     gpio.output(pin_sleep, sleepOFF)
@@ -277,15 +293,17 @@ pwm.start(servoPos_dropped)
 time.sleep(.5)
 pwm.ChangeDutyCycle(0)
 def dropPend():
+    print("Drop pend")
     pwm.ChangeDutyCycle(servoPos_dropped)
     time.sleep(.5)
     pwm.ChangeDutyCycle(0)
 # Grab the pendulum
 def grabPend():
+    print("Grab pend")
     pwm.ChangeDutyCycle(servoPos_grabbed)
     time.sleep(.5)
     pwm.ChangeDutyCycle(0)
-# Test the current test point
+## Test the current test point
 def testPend():
     # Low height
     grabPend()
@@ -388,32 +406,32 @@ def manual():
         manual_goto_frame.place(x=gotogrid_offset_x, y=gotogrid_offset_y)
         for ctr in range(45):
             if ctr==heel20:
-                point_button = Button(manual_goto_menu, text='19\n"20 Heel"', height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text='"20 Heel"', height=buttonheight, width=buttonwidth,
                                      bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col) 
             elif ctr==center:
-                point_button = Button(manual_goto_menu, text="%s\nCenter"%(ctr+1), height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text="Center", height=buttonheight, width=buttonwidth,
                                      bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)   
             elif ctr==toe20:
-                point_button = Button(manual_goto_menu, text='%s\n"20 Toe"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text='"20 Toe"', height=buttonheight, width=buttonwidth,
                                   bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
             elif ctr==high10:
-                point_button = Button(manual_goto_menu, text='%s\n"10 High"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text='"10 High"', height=buttonheight, width=buttonwidth,
                                   bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
             elif ctr==low10:
-                point_button = Button(manual_goto_menu, text='%s\n"10 Low"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text='"10 Low"', height=buttonheight, width=buttonwidth,
                                   bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
             elif ctr==toe10high10:
-                point_button = Button(manual_goto_menu, text='%s\n"10 Toe\n10 High"'%(ctr+1), height=buttonheight, width=buttonwidth,
+                point_button = Button(manual_goto_menu, text='"10 Toe\n10 High"', height=buttonheight, width=buttonwidth,
                                   bg=buttonColor, activebackground=bColor_active, command=partial(goto, ctr))
                 this_row, this_col = divmod(ctr,9)
                 point_button.grid(in_=manual_goto_frame, row=this_row, column=this_col)
@@ -430,8 +448,6 @@ def manual():
     manual_leftButton = tkinter.Button(manual_menu, text = "Left", bg = buttonColor, activebackground=bColor_active, command=stepLeft)
     manual_leftButton.pack()
     manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    #B4.bind('<Button-1>',stepLeft)
-    #B4.bind('ButtonRelease-1',buttonOff)
     # Right button in the manual control menu
     manual_rightButton = tkinter.Button(manual_menu, text = "Right", bg=buttonColor, activebackground=bColor_active, command = stepRight)
     manual_rightButton.pack()
@@ -444,8 +460,23 @@ def manual():
     manual_downButton = tkinter.Button(manual_menu, text="Down", bg=buttonColor, activebackground=bColor_active, command=stepDown)
     manual_downButton.pack()
     manual_downButton.place(relx=(1-buttonsize_relative)/2, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    
+    manual_lowerPendButton = tkinter.Button(manual_menu, text="Lower\nPendulum", bg=buttonColor, activebackground=bColor_active, command=lowerPend)
+    manual_lowerPendButton.pack()
+    manual_lowerPendButton.place(relx=0.5-0.5*buttonsize_relative, rely=buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SE)
+    manual_raisePendButton = tkinter.Button(manual_menu, text="Raise\nPendulum", bg=buttonColor, activebackground=bColor_active, command=raisePend)
+    manual_raisePendButton.pack()
+    manual_raisePendButton.place(relx=0.5+0.5*buttonsize_relative, rely=buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SW)
+    manual_dropPendButton = tkinter.Button(manual_menu, text="Drop\nPendulum", bg=buttonColor, activebackground=bColor_active, command=dropPend)
+    manual_dropPendButton.pack()
+    manual_dropPendButton.place(relx=0.5-0.5*buttonsize_relative, rely=0.5*buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SE)
+    manual_grabPendButton = tkinter.Button(manual_menu, text="Grab\nPendulum", bg=buttonColor, activebackground=bColor_active, command=grabPend)
+    manual_grabPendButton.pack()
+    manual_grabPendButton.place(relx=0.5+0.5*buttonsize_relative, rely=0.5*buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SW)
+
     Label(manual_menu, textvariable=cp_mm_label, bd=0).place(relx=0.5, rely=buttonsize_relative*2, anchor=N)
+    scale = Scale(manual_menu, label="Milimeters", bd=0, variable=scaleDist, orient=HORIZONTAL, length=300, resolution=steps2mm_horiz, to=5, command=getScaleMoveDist)
+    scale.pack()
+    scale.place(relx=0.5, rely=0.7, anchor=CENTER)
 
     # Button to open the Go-to-a-point menu
     manual_gotoButton = tkinter.Button(manual_menu, text="Go to position", bg=buttonColor, activebackground=bColor_active, command = manual_goto)
@@ -466,20 +497,12 @@ def options():
             updateLabel_cp()
         else:
             pass
-    def changeColor():
-        # USE THIS FOR COLOR CALIBRATION
-        dotColor = colorchooser.askcolor(parent=options_menu)
-        print(dotColor)   
     def options_back():
         options_menu.destroy()
     # Back button in the options menu    
     options_backBtn = tkinter.Button(options_menu, text = "<-", bg=buttonColor, activebackground=bColor_active, command = options_back)
     options_backBtn.pack()
     options_backBtn.place(anchor=NW, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
-    # Tracking color chooser button in the options menu
-##    options_colorBtn = tkinter.Button(options_menu, text = "Change Tracking Color", bg=buttonColor, activebackground=bColor_active, command = changeColor)
-##    options_colorBtn.pack()
-##    options_colorBtn.place(relx=(1-buttonsize_relative)/2, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
     # Position calibration button in the options menu
     options_calibrateBtn = tkinter.Button(options_menu, text = "Calibrate\nClub Position", bg=buttonColor, activebackground=bColor_active, command=options_calibrate)
     options_calibrateBtn.pack()
@@ -515,13 +538,26 @@ def updateLabel_progress(progress=0, total=0):
     print("Testing point %s of %s" %(progress, total))
 progress_label = StringVar()
 def updateLabel_cp():
-    cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
+    print("erase this out of uptadeLabel_cp()")
+##    cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
 cp_mm_label = StringVar()
 updateLabel_cp()
 def updateLabel_angle(angle):
     angleLabel.set("Lie angle at address: %s degrees" %angle)
 angleLabel = StringVar()
 updateLabel_angle(15)
+
+def getScaleMoveDist(x):
+    y = scaleDist.get()  
+    global moveDist_vert
+    moveDist_vert = round(y*mm2steps_vert)
+    global moveDist_horiz
+    moveDist_horiz = round(y*mm2steps_horiz)
+    global moveDist_pend  
+    moveDist_pend = round(y*mm2steps_pend)
+    print("Move distance: %s" %y)
+scaleDist = DoubleVar()
+getScaleMoveDist(0)
 
 # Button to open the manual control menu
 manual_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text = "Manual Control", bg=buttonColor, activebackground=bColor_active, command = manual)
@@ -547,4 +583,4 @@ single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
 top.mainloop()
-#gpio.cleanup()
+gpio.cleanup()
