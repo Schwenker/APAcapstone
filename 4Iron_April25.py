@@ -1,8 +1,8 @@
-## Updated: Apr 20, 2017
+## Updated: Apr 25, 2017
 ## To do:
 ## Add a cancel button for tests
 ## Add easy-click icon to desktop to run the proram
-## Add button + entry-box for arbitrary lie-angles 
+## ----> Finish adding button + entry-box for arbitrary lie-angles 
 
 ## Fix message_calibrate
 
@@ -656,7 +656,14 @@ def options():
     options_pts17Btn.place(relx=(1-buttonsize_relative)/2+buttonsize_relative/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
     options_togHndBtn = tkinter.Button(options_menu, text="Toggle Hand\nRight / Left", bg=buttonColor, activebackground=bColor_active, command=toggleHand)
     options_togHndBtn.pack()
-    options_togHndBtn.place(anchor=NW, relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    options_togHndBtn.place(anchor=SE, relx=1, rely=1, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+
+##    def enterAngle():
+##        w = tkinter.Spinbox(options_menu, from_=0, to=360)
+##        w.pack()
+##    options_ptsotherBtn = tkinter.Button(options_menu, text="Enter\nAngle", bg=buttonColor, activebackground=bColor_active, command=enterAngle)
+##    options_ptsotherBtn.pack()
+##    options_ptsotherBtn.place(relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
 
     Label(options_menu, textvariable=angleLabel, bd=0).place(relx=0.5, rely=1-buttonsize_relative, anchor=S)
 
@@ -736,11 +743,6 @@ single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text
 single_button.pack()
 single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
-def cancelTest():
-    break
-cancel_button = tkinter.Button(top, command=cancelTest)
-cancel_button.pack()
-cancel_button.place(relx=0, rely=0, anchor=NW)
 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
