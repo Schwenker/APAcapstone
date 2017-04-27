@@ -1,16 +1,14 @@
-## Updated: Apr 25, 2017
+## Updated: Apr 26, 2017
 ## To do:
-## Add a cancel button for tests
 ## Add easy-click icon to desktop to run the proram
-## ----> Finish adding button + entry-box for arbitrary lie-angles 
+## Add a cancel button for tests
+## Minimize the taskbar on Raspbian
 
-## Fix message_calibrate
-
-##import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 import time
 import sys
 import math
-##import numpy as np
+import numpy as np
 from functools import partial
 
 import tkinter
@@ -18,8 +16,6 @@ from tkinter import messagebox
 from tkinter import colorchooser
 from tkinter import PhotoImage
 from tkinter import *
-##from tkinter import ttk
-##from tkinter.ttk import *
 
 # Variables for easy changes
 
@@ -104,307 +100,283 @@ clubhand = "Right"
 lieangle = 15
 
 # Initialize pinouts
-##gpio.setmode(gpio.BOARD)
-##gpio.setup(pin_sleep, gpio.OUT)
-##gpio.setup(pin_directionHorizontal, gpio.OUT)
-##gpio.setup(pin_directionVertical, gpio.OUT)
-##gpio.setup(pin_directionVerticalRight, gpio.OUT)
-##gpio.setup(pin_directionPendulum, gpio.OUT)
-##gpio.setup(pin_grabPendulum, gpio.OUT)
-##gpio.setup(pin_stepHorizontal, gpio.OUT)
-##gpio.setup(pin_stepVertical, gpio.OUT)
-##gpio.setup(pin_stepVerticalRight, gpio.OUT)
-##gpio.setup(pin_stepPendulum, gpio.OUT)
+gpio.setmode(gpio.BOARD)
+gpio.setup(pin_sleep, gpio.OUT)
+gpio.setup(pin_directionHorizontal, gpio.OUT)
+gpio.setup(pin_directionVertical, gpio.OUT)
+gpio.setup(pin_directionVerticalRight, gpio.OUT)
+gpio.setup(pin_directionPendulum, gpio.OUT)
+gpio.setup(pin_grabPendulum, gpio.OUT)
+gpio.setup(pin_stepHorizontal, gpio.OUT)
+gpio.setup(pin_stepVertical, gpio.OUT)
+gpio.setup(pin_stepVerticalRight, gpio.OUT)
+gpio.setup(pin_stepPendulum, gpio.OUT)
 
 # Initialize sleep mode
-##gpio.output(pin_sleep, sleepON)
+gpio.output(pin_sleep, sleepON)
 
 #Map test point positions in mm from center
 #Common lie angles at address are 15, 16, and 17 degrees
 #Row 1 is x coordinates (left to right)
 #Row 2 is y coordinates (top to bottom)
 
-### This batch is for right handed clubs
-##pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
-##ang = math.radians(-90+15)
-##rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
-##pts15_mm = np.matmul(rotator, pts0_mm)
-##ang = math.radians(1)
-##rotator = [[math.cos(ang), math.sin(ang)],
-##                     [-(math.sin(ang)), math.cos(ang)]]
-##pts16_mm = np.matmul(rotator, pts15_mm)
-##pts17_mm = np.matmul(rotator, pts16_mm)
-##ptsother_mm = pts0_mm
-##
-##pts15_steps = pts15_mm
-##pts15_steps[0][:] *= mm2steps_horiz
-##pts15_steps[1][:] *= mm2steps_vert
-##pts15_steps[:][:] = np.round(pts15_steps[:][:])
-##pts15_steps = pts15_steps.astype(int)
-##
-##pts16_steps = pts16_mm
-##pts16_steps[0][:] *= mm2steps_horiz
-##pts16_steps[1][:] *= mm2steps_vert
-##pts16_steps[:][:] = np.round(pts16_steps[:][:])
-##pts16_steps = pts16_steps.astype(int)
-##
-##pts17_steps = pts17_mm
-##pts17_steps[0][:] *= mm2steps_horiz
-##pts17_steps[1][:] *= mm2steps_vert
-##pts17_steps[:][:] = np.round(pts17_steps[:][:])
-##pts17_steps = pts17_steps.astype(int)
-##
-##ptsother_steps = ptsother_mm
-##ptsCurrent_steps = pts15_steps
-##
-### This batch is for left handed clubs
-##ang = math.radians(90-15)
-##rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
-##pts15_lh_mm = np.matmul(rotator, pts0_mm)
-##ang = math.radians(-1)
-##rotator = [[math.cos(ang), math.sin(ang)],
-##                     [-(math.sin(ang)), math.cos(ang)]]
-##pts16_lh_mm = np.matmul(rotator, pts15_lh_mm)
-##pts17_lh_mm = np.matmul(rotator, pts16_lh_mm)
-##
-##pts15_lh_steps = pts15_lh_mm
-##pts15_lh_steps[0][:] *= mm2steps_horiz
-##pts15_lh_steps[1][:] *= mm2steps_vert
-##pts15_lh_steps[:][:] = np.round(pts15_lh_steps[:][:])
-##pts15_lh_steps = pts15_lh_steps.astype(int)
-##
-##pts16_lh_steps = pts16_lh_mm
-##pts16_lh_steps[0][:] *= mm2steps_horiz
-##pts16_lh_steps[1][:] *= mm2steps_vert
-##pts16_lh_steps[:][:] = np.round(pts16_lh_steps[:][:])
-##pts16_lh_steps = pts16_lh_steps.astype(int)
-##
-##pts17_lh_steps = pts17_lh_mm
-##pts17_lh_steps[0][:] *= mm2steps_horiz
-##pts17_lh_steps[1][:] *= mm2steps_vert
-##pts17_lh_steps[:][:] = np.round(pts17_lh_steps[:][:])
-##pts17_lh_steps = pts17_lh_steps.astype(int)
+# This batch is for right handed clubs
+pts0_mm = np.matrix('-20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20 -20 -15 -10 -5 0 5 10 15 20; 10 10 10 10 10 10 10 10 10 5 5 5 5 5 5 5 5 5 0 0 0 0 0 0 0 0 0 -5 -5 -5 -5 -5 -5 -5 -5 -5 -10 -10 -10 -10 -10 -10 -10 -10 -10')
+ang = math.radians(-90+15)
+rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+pts15_mm = np.matmul(rotator, pts0_mm)
+ang = math.radians(1)
+rotator = [[math.cos(ang), math.sin(ang)],
+                     [-(math.sin(ang)), math.cos(ang)]]
+pts16_mm = np.matmul(rotator, pts15_mm)
+pts17_mm = np.matmul(rotator, pts16_mm)
+ptsother_mm = pts0_mm
+
+pts15_steps = pts15_mm
+pts15_steps[0][:] *= mm2steps_horiz
+pts15_steps[1][:] *= mm2steps_vert
+pts15_steps[:][:] = np.round(pts15_steps[:][:])
+pts15_steps = pts15_steps.astype(int)
+
+pts16_steps = pts16_mm
+pts16_steps[0][:] *= mm2steps_horiz
+pts16_steps[1][:] *= mm2steps_vert
+pts16_steps[:][:] = np.round(pts16_steps[:][:])
+pts16_steps = pts16_steps.astype(int)
+
+pts17_steps = pts17_mm
+pts17_steps[0][:] *= mm2steps_horiz
+pts17_steps[1][:] *= mm2steps_vert
+pts17_steps[:][:] = np.round(pts17_steps[:][:])
+pts17_steps = pts17_steps.astype(int)
+
+ptsother_steps = ptsother_mm
+ptsCurrent_steps = pts15_steps
+
+# This batch is for left handed clubs
+ang = math.radians(90-15)
+rotator = [[math.cos(ang), math.sin(ang)], [-(math.sin(ang)), math.cos(ang)]]
+pts15_lh_mm = np.matmul(rotator, pts0_mm)
+ang = math.radians(-1)
+rotator = [[math.cos(ang), math.sin(ang)],
+                     [-(math.sin(ang)), math.cos(ang)]]
+pts16_lh_mm = np.matmul(rotator, pts15_lh_mm)
+pts17_lh_mm = np.matmul(rotator, pts16_lh_mm)
+
+pts15_lh_steps = pts15_lh_mm
+pts15_lh_steps[0][:] *= mm2steps_horiz
+pts15_lh_steps[1][:] *= mm2steps_vert
+pts15_lh_steps[:][:] = np.round(pts15_lh_steps[:][:])
+pts15_lh_steps = pts15_lh_steps.astype(int)
+
+pts16_lh_steps = pts16_lh_mm
+pts16_lh_steps[0][:] *= mm2steps_horiz
+pts16_lh_steps[1][:] *= mm2steps_vert
+pts16_lh_steps[:][:] = np.round(pts16_lh_steps[:][:])
+pts16_lh_steps = pts16_lh_steps.astype(int)
+
+pts17_lh_steps = pts17_lh_mm
+pts17_lh_steps[0][:] *= mm2steps_horiz
+pts17_lh_steps[1][:] *= mm2steps_vert
+pts17_lh_steps[:][:] = np.round(pts17_lh_steps[:][:])
+pts17_lh_steps = pts17_lh_steps.astype(int)
 
 # Initialize current position in steps from center
 ##cp_steps = np.matrix('0; 0') # Current position
 pendPos_steps = 0 # Pendulum postion
 
 
-def donothing():    # Do nothing
-    print("Do nothing")
-
 # Reset position tracker to (0,0)
 def calibrate():
     print("erase this out of claibrate() function")
-##    cp_steps[0,0] = 0
-##    cp_steps[1,0] = 0
-
-
+    cp_steps[0,0] = 0
+    cp_steps[1,0] = 0
 # Swicth golfclub lie angles
 # Right handed angle is -90+angle, left handed angle is +90-angle
 def rotate(angle=15): # Positive angle is counterclockwise
-    updateLabel_angle(angle, clubhand)
     global ptsCurrent_steps
     global lieangle
-    lieangle = angle
+    if ((angle==1) or (angle==-1)):
+        lieangle += angle
+    else:
+        lieangle = angle
+    updateLabel_angle(lieangle, clubhand)
     print(lieangle)
-##    if clubhand == "Right":
-##        if angle==15:
-##            ptsCurrent_steps = pts15_steps
-##        elif angle==16:
-##            ptsCurrent_steps = pts16_steps
-##        elif angle==17:
-##            ptsCurrent_steps = pts17_steps
-##        else:
-##            ang = math.radians(-90+angle)
-##            rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                             [-(math.sin(ang)), math.cos(ang)]])
-##            ptsother_mm = np.matmul(rotator, pts0_mm)
-##            ptsother_steps = ptsother_mm
-##            ptsother_steps[0][:] *= mm2steps_horiz
-##            ptsother_steps[1][:] *= mm2steps_vert
-##            ptsother_steps[:][:] = np.round(ptsother_steps[:][:])
-##            ptsother_steps = ptsother_steps.astype(int)
-##            ptsCurrent_steps = ptsother_steps   
-##    elif clubhand == "Left":
-##        if angle==15:
-##            ptsCurrent_steps = pts15_lh_steps
-##        elif angle==16:
-##            ptsCurrent_steps = pts16_lh_steps
-##        elif angle==17:
-##            ptsCurrent_steps = pts17_lh_steps
-##        else:
-##            ang = math.radians(90-angle)
-##            rotator = np.matrix([[math.cos(ang), math.sin(ang)],
-##                             [-(math.sin(ang)), math.cos(ang)]])
-##            ptsother_mm = np.matmul(rotator, pts0_mm)
-##            ptsother_steps = ptsother_mm
-##            ptsother_steps[0][:] *= mm2steps_horiz
-##            ptsother_steps[1][:] *= mm2steps_vert
-##            ptsother_steps[:][:] = np.round(ptsother_steps[:][:])
-##            ptsother_steps = ptsother_steps.astype(int)
-##            ptsCurrent_steps = ptsother_steps
+    if clubhand == "Right":
+        if angle==15:
+            ptsCurrent_steps = pts15_steps
+        elif angle==16:
+            ptsCurrent_steps = pts16_steps
+        elif angle==17:
+            ptsCurrent_steps = pts17_steps
+        else:
+            ang = math.radians(angle)
+            rotator = np.matrix([[math.cos(ang), math.sin(ang)],
+                             [-(math.sin(ang)), math.cos(ang)]])
+            ptsother_steps = np.matmul(rotator, ptsCurrent_steps)
+            ptsother_steps[:][:] = np.round(ptsother_steps[:][:])
+            ptsother_steps = ptsother_steps.astype(int)
+            ptsCurrent_steps = ptsother_steps   
+    elif clubhand == "Left":
+        if angle==15:
+            ptsCurrent_steps = pts15_lh_steps
+        elif angle==16:
+            ptsCurrent_steps = pts16_lh_steps
+        elif angle==17:
+            ptsCurrent_steps = pts17_lh_steps
+        else:
+            ang = math.radians(-angle)
+            rotator = np.matrix([[math.cos(ang), math.sin(ang)],
+                             [-(math.sin(ang)), math.cos(ang)]])
+            ptsother_steps = np.matmul(rotator, ptsCurrent_steps)
+            ptsother_steps[:][:] = np.round(ptsother_steps[:][:])
+            ptsother_steps = ptsother_steps.astype(int)
+            ptsCurrent_steps = ptsother_steps 
+# Toggle between right-handed and left-handed clubs
 def toggleHand():
     global clubhand
     global low10
     global high10
     global toe10high10
-
     if clubhand == "Right":
         clubhand = "Left"
     elif clubhand == "Left":
         clubhand = "Right"
     else:
         print("Error switching club between right and left handedness.")
-    print(clubhand)
-
     if clubhand == "Right":
-        #toe20 = 26
-        #heel20 = 18
         low10 = 4
         high10 = 40
         toe10high10 = 42
-        #center = 22
     elif clubhand == "Left":
-        #toe20 = 26
-        #heel20 = 18
         low10 = 40
         high10 = 4
         toe10high10 = 6
-        #center = 22
     rotate(lieangle)
 
 # Move left
 def stepLeft(dist=-99999):
     if dist == -99999:
         dist = -moveDist_horiz
-    print(dist)
-##    cp_steps[0,0] += dist
+    cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1      
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionHorizontal, directionLeft)
-##    for x in range(dist):
-##            gpio.output(pin_stepHorizontal, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepHorizontal, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionHorizontal, directionLeft)
+    for x in range(dist):
+            gpio.output(pin_stepHorizontal, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepHorizontal, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 # Move right
 def stepRight(dist=99999):
     if dist == 99999:
         dist = moveDist_horiz
-    print(dist)
-##    cp_steps[0,0] += dist
+    cp_steps[0,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionHorizontal, directionRight)
-##    for x in range(dist):
-##            gpio.output(pin_stepHorizontal, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepHorizontal, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionHorizontal, directionRight)
+    for x in range(dist):
+            gpio.output(pin_stepHorizontal, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepHorizontal, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 # Move up
 def stepUp(dist=99999):
     if dist == 99999:
         dist = moveDist_vert
-    print(dist)
-##    cp_steps[1,0] += dist
+    cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionVertical, directionUp)
-##    gpio.output(pin_directionVerticalRight, directionUp)
-##    for x in range(dist):
-##            gpio.output(pin_stepVertical, 0)
-##            gpio.output(pin_stepVerticalRight, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepVertical, 1)
-##            gpio.output(pin_stepVerticalRight, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionVertical, directionUp)
+    gpio.output(pin_directionVerticalRight, directionUp)
+    for x in range(dist):
+            gpio.output(pin_stepVertical, 0)
+            gpio.output(pin_stepVerticalRight, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepVertical, 1)
+            gpio.output(pin_stepVerticalRight, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 # Move down
 def stepDown(dist=-99999):
     if dist == -99999:
         dist = -moveDist_vert
-    print(dist)
-##    cp_steps[1,0] += dist
+    cp_steps[1,0] += dist
     updateLabel_cp()
     if dist < 0:
         dist *= -1
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionVertical, directionDown)
-##    gpio.output(pin_directionVerticalRight, directionDown)
-##    for x in range(dist):
-##            gpio.output(pin_stepVertical, 0)
-##            gpio.output(pin_stepVerticalRight, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepVertical, 1)
-##            gpio.output(pin_stepVerticalRight, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionVertical, directionDown)
+    gpio.output(pin_directionVerticalRight, directionDown)
+    for x in range(dist):
+            gpio.output(pin_stepVertical, 0)
+            gpio.output(pin_stepVerticalRight, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepVertical, 1)
+            gpio.output(pin_stepVerticalRight, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 # Go to a specific test point 
 def goto(point):
-    print("Erase ti from goto()")
-##    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
-##    if dist[0,0] < 0:
-##        stepLeft(dist[0,0])
-##    elif dist[0,0] > 0:
-##        stepRight(dist[0,0])
-##    if dist[1,0] < 0:
-##        stepDown(dist[1,0])
-##    elif dist[1,0] > 0:
-##        stepUp(dist[1,0])  
-# Raise the pendulum by 'height' number of steps
+    dist = np.subtract(ptsCurrent_steps[:,point], cp_steps)
+    if dist[0,0] < 0:
+        stepLeft(dist[0,0])
+    elif dist[0,0] > 0:
+        stepRight(dist[0,0])
+    if dist[1,0] < 0:
+        stepDown(dist[1,0])
+    elif dist[1,0] > 0:
+        stepUp(dist[1,0])  
+# Raise the pendulum
 def raisePend(height=99999):
     if height == 99999:
         height = moveDist_pend
-    print(height)
     global pendPos_steps
-##    pendPos_steps += height      
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionPendulum, directionPendRaise) 
-##    for x in range(height):
-##            gpio.output(pin_stepPendulum, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepPendulum, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    pendPos_steps += height      
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionPendulum, directionPendRaise) 
+    for x in range(height):
+            gpio.output(pin_stepPendulum, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepPendulum, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
+# Lower the pendulum
 def lowerPend(height=99999):
     if height == 99999:
         height = moveDist_pend
-    print(height)
     global pendPos_steps
-##    pendPos_steps -= height      
-##    gpio.output(pin_sleep, sleepOFF)
-##    gpio.output(pin_directionPendulum, directionPendLower) 
-##    for x in range(height):
-##            gpio.output(pin_stepPendulum, 0)
-##            time.sleep(sleeptime/2)
-##            gpio.output(pin_stepPendulum, 1)
-##            time.sleep(sleeptime/2)
-##    gpio.output(pin_sleep, sleepON)
+    pendPos_steps -= height      
+    gpio.output(pin_sleep, sleepOFF)
+    gpio.output(pin_directionPendulum, directionPendLower) 
+    for x in range(height):
+            gpio.output(pin_stepPendulum, 0)
+            time.sleep(sleeptime/2)
+            gpio.output(pin_stepPendulum, 1)
+            time.sleep(sleeptime/2)
+    gpio.output(pin_sleep, sleepON)
 # Drop the pendulum
-##pwm = gpio.PWM(pin_grabPendulum, freq_servo)
-##pwm.start(servoPos_dropped)
+pwm = gpio.PWM(pin_grabPendulum, freq_servo)
+pwm.start(servoPos_dropped)
 time.sleep(.5)
-##pwm.ChangeDutyCycle(0)
+pwm.ChangeDutyCycle(0)
 def dropPend():
-    print("Drop pend")
-##    pwm.ChangeDutyCycle(servoPos_dropped)
-    time.sleep(.5)
-##    pwm.ChangeDutyCycle(0)
+    pwm.ChangeDutyCycle(servoPos_dropped)
+    time.sleep(.3)
+    pwm.ChangeDutyCycle(0)
 # Grab the pendulum
 def grabPend():
-    print("Grab pend")
-##    pwm.ChangeDutyCycle(servoPos_grabbed)
-    time.sleep(.5)
-##    pwm.ChangeDutyCycle(0)
+    pwm.ChangeDutyCycle(servoPos_grabbed)
+    time.sleep(.3)
+    pwm.ChangeDutyCycle(0)
 # Test the current test point
 def testPend():
     pendpause = 0.1
@@ -429,7 +401,7 @@ def testPend():
     #time.sleep(pendpause)
     dropPend()
     lowerPend(pendPos_steps)
-
+# Disable buttons in the main menu
 def buttonsEnable(state):
     if state == 'disable':
         options_button.config(state=DISABLED)
@@ -443,38 +415,38 @@ def buttonsEnable(state):
         RnD_button.config(state=NORMAL)
         fullMap_button.config(state=NORMAL)
         single_button.config(state=NORMAL)
-# Test the 5 most at-risk test points
+# Test the 6 most at-risk test points
 def RnD_test():
     buttonsEnable('disable')
     progLabel.place(relx=0, rely=1, anchor=SW)
-    # Center
+    # Center point
     updateLabel_progress(1, 6)
     goto(center)
     testPend()
-    # 20 Toe
+    # 20 Toe point
     updateLabel_progress(2, 6)
     goto(toe20)
     testPend()
-    # 10 Low
+    # 10 Low point
     updateLabel_progress(3, 6)
     goto(low10)
     testPend()
-    # 20 Heel
+    # 20 Heel point
     updateLabel_progress(4, 6)
     goto(heel20)
     testPend()
-    # 10 High
+    # 10 High point
     updateLabel_progress(5, 6)
     goto(high10)
     testPend()
-    # 10 Toe / 10 High
+    # 10 Toe / 10 High point
     updateLabel_progress(6, 6)
     goto(toe10high10)
     testPend()
     progLabel.place_forget()
     time.sleep(1)
     buttonsEnable('enable')
-# Test all test points (takes a while to complete)
+# Test 20x40mm grid of 45 points 5mm apart
 def fullMap_test():
     ctr = 0
     buttonsEnable('disable')
@@ -483,27 +455,27 @@ def fullMap_test():
         ctr += 1
         updateLabel_progress(ctr, 45)
         goto(pt)
-        testPend()        
+        testPend()
     for pt in range(17, 8, -1):
-        goto(pt)
-        testPend()
         ctr += 1
         updateLabel_progress(ctr, 45)
+        goto(pt)
+        testPend()
     for pt in range(18, 27, 1):
-        goto(pt)
-        testPend()
         ctr += 1
         updateLabel_progress(ctr, 45)
+        goto(pt)
+        testPend()
     for pt in range(35, 26, -1):
-        goto(pt)
-        testPend()
         ctr += 1
         updateLabel_progress(ctr, 45)
+        goto(pt)
+        testPend()
     for pt in range(36, 45, 1):
-        goto(pt)
-        testPend()
         ctr += 1
         updateLabel_progress(ctr, 45)
+        goto(pt)
+        testPend()
     progLabel.place_forget()
     time.sleep(1)
     buttonsEnable('enable')        
@@ -518,7 +490,6 @@ def manual():
         manual_menu.destroy()
     def manual_calibrate():
         if messagebox.askyesno(title_calibrate, message_calibrate, parent=manual_menu) == True:
-           #function(return): askquestion('yes' or 'no'), askokcancel(true or false), askyesno(true or false)
             calibrate()
             updateLabel_cp()
         else:
@@ -538,6 +509,7 @@ def manual():
                                      relwidth=buttonsize_relative/2)
         manual_goto_frame = Frame(manual_goto_menu, height=400, width=480)
         manual_goto_frame.place(x=gotogrid_offset_x, y=gotogrid_offset_y)
+        # Create a 5x9 grid of buttons for each point on 20x40mm grid of 45 points 5mm apart
         for ctr in range(45):
             if ctr==heel20:
                 point_button = Button(manual_goto_menu, text='"20 Heel"', height=buttonheight, width=buttonwidth,
@@ -582,8 +554,6 @@ def manual():
     manual_leftButton = tkinter.Button(manual_menu, text = "Left", bg = buttonColor, activebackground=bColor_active, command=stepLeft)
     manual_leftButton.pack()
     manual_leftButton.place(relx=(1-buttonsize_relative)/2-buttonsize_relative, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    #B4.bind('<Button-1>',stepLeft)
-    #B4.bind('ButtonRelease-1',buttonOff)
     # Right button in the manual control menu
     manual_rightButton = tkinter.Button(manual_menu, text = "Right", bg=buttonColor, activebackground=bColor_active, command = stepRight)
     manual_rightButton.pack()
@@ -596,26 +566,31 @@ def manual():
     manual_downButton = tkinter.Button(manual_menu, text="Down", bg=buttonColor, activebackground=bColor_active, command=stepDown)
     manual_downButton.pack()
     manual_downButton.place(relx=(1-buttonsize_relative)/2, rely=buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    # Button to lower the pendulum
     manual_lowerPendButton = tkinter.Button(manual_menu, text="Lower\nPendulum", bg=buttonColor, activebackground=bColor_active, command=lowerPend)
     manual_lowerPendButton.pack()
     manual_lowerPendButton.place(relx=0.5-0.5*buttonsize_relative, rely=buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SE)
+    # Button to raise the pendulum
     manual_raisePendButton = tkinter.Button(manual_menu, text="Raise\nPendulum", bg=buttonColor, activebackground=bColor_active, command=raisePend)
     manual_raisePendButton.pack()
     manual_raisePendButton.place(relx=0.5+0.5*buttonsize_relative, rely=buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SW)
+    # Button to drop the pendulum
     manual_dropPendButton = tkinter.Button(manual_menu, text="Drop\nPendulum", bg=buttonColor, activebackground=bColor_active, command=dropPend)
     manual_dropPendButton.pack()
     manual_dropPendButton.place(relx=0.5-0.5*buttonsize_relative, rely=0.5*buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SE)
+    # Button to grab the pendulum
     manual_grabPendButton = tkinter.Button(manual_menu, text="Grab\nPendulum", bg=buttonColor, activebackground=bColor_active, command=grabPend)
     manual_grabPendButton.pack()
     manual_grabPendButton.place(relx=0.5+0.5*buttonsize_relative, rely=0.5*buttonsize_relative, relheight=0.5*buttonsize_relative, relwidth=0.5*buttonsize_relative, anchor=SW)
-
+    # Label showing the current position of the club in milimeters
     Label(manual_menu, textvariable=cp_mm_label, bd=0).place(relx=0.5, rely=buttonsize_relative*2, anchor=N)
+    # Dragable bar to select movement distance in mm when buttons are pressed in the manual control menu
     scale = Scale(manual_menu, label="Milimeters", bd=0, variable=scaleDist, orient=HORIZONTAL, length=300, resolution=steps2mm_horiz, to=5, command=getScaleMoveDist)
     scale.pack()
     scale.place(relx=0.5, rely=0.7, anchor=CENTER)
 
     # Button to open the Go-to-a-point menu
-    manual_gotoButton = tkinter.Button(manual_menu, text="Go to position", bg=buttonColor, activebackground=bColor_active, command = manual_goto)
+    manual_gotoButton = tkinter.Button(manual_menu, text="Go To Position", bg=buttonColor, activebackground=bColor_active, command = manual_goto)
     manual_gotoButton.pack()
     manual_gotoButton.place(relx=(1-buttonsize_relative)/2, rely=1-buttonsize_relative/2, relheight=buttonsize_relative/2, relwidth=buttonsize_relative)
     # Positional calibration button the manual control menu
@@ -640,38 +615,36 @@ def options():
     options_backBtn.pack()
     options_backBtn.place(anchor=NW, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
 
-    # Position calibration button in the options menu
+    # Buttons to select different club types
     options_calibrateBtn = tkinter.Button(options_menu, text = "Calibrate\nClub Position", bg=buttonColor, activebackground=bColor_active, command=options_calibrate)
     options_calibrateBtn.pack()
-    options_calibrateBtn.place(relx=(1-buttonsize_relative)/2, rely=0.2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
-    # Radio buttons to select lie angle at address
+    options_calibrateBtn.place(relx=1-buttonsize_relative/2, rely=0, relheight=buttonsize_relative/2, relwidth=buttonsize_relative/2)
     options_pts15Btn = tkinter.Button(options_menu, text="15\nDegrees", bg=buttonColor, activebackground=bColor_active, command=lambda i=15: rotate(i) )
     options_pts15Btn.pack()
-    options_pts15Btn.place(relx=(1-buttonsize_relative)/2-buttonsize_relative/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    options_pts15Btn.place(anchor=S, relx=0.5-buttonsize_relative/2, rely=1, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
     options_pts16Btn = tkinter.Button(options_menu, text="16\nDegrees", bg=buttonColor, activebackground=bColor_active, command=lambda i=16: rotate(i) )
     options_pts16Btn.pack()
-    options_pts16Btn.place(relx=(1-buttonsize_relative)/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    options_pts16Btn.place(anchor=S, relx=0.5, rely=1, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
     options_pts17Btn = tkinter.Button(options_menu, text="17\nDegrees", bg=buttonColor, activebackground=bColor_active, command=lambda i=17: rotate(i) )
     options_pts17Btn.pack()
-    options_pts17Btn.place(relx=(1-buttonsize_relative)/2+buttonsize_relative/2, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    options_pts17Btn.place(anchor=S, relx=0.5+buttonsize_relative/2, rely=1, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
+    repdelay = 500
+    repinterval = 10
+    options_ptsotherUpBtn = tkinter.Button(options_menu, text="Increase\nAngle", bg=buttonColor, activebackground=bColor_active, repeatdelay=repdelay, repeatinterval=repinterval, command=lambda i=1: rotate(i))
+    options_ptsotherUpBtn.pack()
+    options_ptsotherUpBtn.place(anchor=S, relx=0.5+buttonsize_relative, rely=1, relheight=buttonsize_relative*2/3, relwidth=buttonsize_relative/2)
+    options_ptsotherDwnBtn = tkinter.Button(options_menu, text="Decrease\nAngle", bg=buttonColor, activebackground=bColor_active, repeatdelay=repdelay, repeatinterval=repinterval, command=lambda i=-1: rotate(i))
+    options_ptsotherDwnBtn.pack()
+    options_ptsotherDwnBtn.place(anchor=S, relx=0.5-buttonsize_relative, rely=1, relheight=buttonsize_relative*2/3, relwidth=buttonsize_relative/2)
     options_togHndBtn = tkinter.Button(options_menu, text="Toggle Hand\nRight / Left", bg=buttonColor, activebackground=bColor_active, command=toggleHand)
     options_togHndBtn.pack()
-    options_togHndBtn.place(anchor=SE, relx=1, rely=1, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
-
-##    def enterAngle():
-##        w = tkinter.Spinbox(options_menu, from_=0, to=360)
-##        w.pack()
-##    options_ptsotherBtn = tkinter.Button(options_menu, text="Enter\nAngle", bg=buttonColor, activebackground=bColor_active, command=enterAngle)
-##    options_ptsotherBtn.pack()
-##    options_ptsotherBtn.place(relx=(1-buttonsize_relative)/2+buttonsize_relative, rely=1-buttonsize_relative, relheight=buttonsize_relative, relwidth=buttonsize_relative/2)
-
+    options_togHndBtn.place(anchor=CENTER, relx=.5, rely=0.35, relheight=buttonsize_relative, relwidth=buttonsize_relative)
+    # Label to show the current club configuration in the options menu
     Label(options_menu, textvariable=angleLabel, bd=0).place(relx=0.5, rely=1-buttonsize_relative, anchor=S)
 
     
-
-# Begin main program here
+# The interface opens here and begins to execute
 calibrate()
-
 top = tkinter.Tk()
 top.title(title_top)
 top.geometry(menusize)
@@ -681,18 +654,18 @@ top.resizable(FALSE,FALSE)
 ##bgTop.grid(row=0, column=0)
 ##bgTop.lower()
 
+# Loading bar on the main menu
 progressLabel = StringVar()
 progLabel = Label(top, textvariable=progressLabel, bd=0)
 def updateLabel_progress(progress=0, total=0):
     progressLabel.set("Testing point %s of %s ..." %(progress, total))
-    progLabel.update()
-    print("Testing point %s of %s" %(progress, total))
-
+    progLabel.update() # DANGER # .update() is risky as it processes ALL pending actions, potentially including infinite loops!
+# Update the label showing the club's current position
 def updateLabel_cp():
-    print("erase this out of uptadeLabel_cp()")
-##    cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
+    cp_mm_label.set("Current position: (%s, %s)mm" %(steps2mm_horiz*cp_steps[0,0], steps2mm_vert*cp_steps[1,0]))
 cp_mm_label = StringVar()
 updateLabel_cp()
+# Update the lable showing the club's current configuration
 def updateLabel_angle(angle, clubhand):
     angleLabel.set("%s handed club\nLie angle at address: %s degrees" %(clubhand, angle))
 angleLabel = StringVar()
@@ -729,7 +702,8 @@ def fullMap_warn():
             fullMap_test()
     else:
             pass
-
+##def cancelTest():
+##    return(return)
 # Button to run the shortened R&D test
 RnD_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text="R&D Standard\n(9 mins)", bg=buttonColor, activebackground=bColor_active, command=RnD_warn)
 RnD_button.pack()
@@ -743,6 +717,9 @@ single_button = tkinter.Button(top, height=buttonheight, width=buttonwidth, text
 single_button.pack()
 single_button.place(relx=1-buttonsize_relative, rely=(1-buttonsize_relative)/2, relheight=buttonsize_relative, relwidth=buttonsize_relative)
 
+##cancel_button = tkinter.Button(top, text="Cancel Test", bg=buttonColor, activebackground=bColor_active, command=cancelTest)
+##cancel_button.pack()
+##cancel_button.place(anchor=NW, relx=0, rely=0)
 
 # tkinter's repeatdelay and repeatinterval values are in miliseconds
 
