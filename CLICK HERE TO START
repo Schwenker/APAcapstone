@@ -3,4 +3,9 @@ source ~/.profile
 workon cv
 python Four-Iron_UGRADS.py
 
-# /home/pi/Desktop/
+# This script should work if both this file and Four-Iron_UGRADS.py
+# are in the same directory. If not, place both no the desktop and
+# replace "Four-Iron_UGRADS.py with "/home/pi/Desktop/Four-Iron_UGRADS.py"
+
+# To open the idlelib, replace "python /home/pi/Desktop/Four-Iron_UGRADS.py" with:
+# python -m idlelib
