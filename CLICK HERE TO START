@@ -1,0 +1,6 @@
+#!/bin/bash
+source ~/.profile
+workon cv
+python Four-Iron_UGRADS.py
+
+# /home/pi/Desktop/
