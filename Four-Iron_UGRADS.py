@@ -251,7 +251,7 @@ def toggleHand():
     elif clubhand == "Left":
         low10 = 4
         high10 = 40
-        toe10high10 = 6 ########## ??????????
+        toe10high10 = 38
     rotate(lieangle)
 
 # Move left
